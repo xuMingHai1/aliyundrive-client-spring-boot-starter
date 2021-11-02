@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  xyz.xmh.autoconfigure.ClientAutoConfiguration,\
+  xyz.xmh.autoconfigure.CacheAutoConfiguration
