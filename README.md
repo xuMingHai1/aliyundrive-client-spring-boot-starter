@@ -40,8 +40,8 @@ refresh_token获取说明
 注入ReactiveClientTemplate或ClientTemplate就可以使用了
 
 测试用例：
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1027/225053_b63d776a_8492227.png "屏幕截图.png")
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1027/225133_8ca2c4b3_8492227.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1102/175010_9fd8b0c1_8492227.png "屏幕截图.png")
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1102/175025_fdfdbb5c_8492227.png "屏幕截图.png")
 自定义缓存实例说明，需要继承AbstractCacheInstance和实现Cache接口
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1028/111034_e1fb5b4d_8492227.png "屏幕截图.png")
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1028/110946_046fe4e3_8492227.png "屏幕截图.png")

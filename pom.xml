@@ -18,7 +18,7 @@
 
     <groupId>xyz.xmh</groupId>
     <artifactId>aliyundrive-client-spring-boot-starter</artifactId>
-    <version>0.0.2-alpha</version>
+    <version>0.0.3-alpha</version>
     <packaging>jar</packaging>
 
     <description>这是一个基于WebFlux.WebClient的阿里云盘客户端</description>
@@ -108,12 +108,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-
-            <!-- 文档jar包 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
