@@ -6,7 +6,7 @@
 
 #### 软件架构
 
-对应阿里云盘接口来架构，使用springboot的自动装配，使用的Reactive很适合高并发的访问，参照了mybatis的缓存
+采用了从下到上的架构，最底层封装阿里云盘接口的访问，再由中间的执行器对数据进行处理，最后到达模板类，扩展使用方法。使用springboot的自动装配，使用的Reactive很适合高并发的访问，参照了mybatis的缓存
 
 #### 安装教程
 
@@ -38,6 +38,8 @@ refresh_token获取说明
 配置简单方便，十分人性化！
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1027/005750_3e516986_8492227.png "屏幕截图.png")
 注入ReactiveClientTemplate或ClientTemplate就可以使用了
+
+测试用例：
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1027/225053_b63d776a_8492227.png "屏幕截图.png")
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1027/225133_8ca2c4b3_8492227.png "屏幕截图.png")
 自定义缓存实例说明，需要继承AbstractCacheInstance和实现Cache接口

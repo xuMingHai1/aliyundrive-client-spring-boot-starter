@@ -92,7 +92,7 @@ public class BlockClientTest {
     @Order(2)
     void testUpload() {
         try {
-            final CreateFileResponse createFileResponse = blockClientTemplate.uploadFile(Paths.get("C:", "Users", "admin", "Desktop", "test.txt"));
+            final CreateFileResponse createFileResponse = blockClientTemplate.uploadFile(Paths.get("README.md"));
             log.info("是否快传：{}", createFileResponse.isRapidUpload());
             log.info("上传文件所在的目录id: {}", createFileResponse.getParentFileId());
         } catch (WebClientResponseException e) {
