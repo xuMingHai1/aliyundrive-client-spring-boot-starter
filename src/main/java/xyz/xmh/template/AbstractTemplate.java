@@ -152,6 +152,19 @@ abstract class AbstractTemplate {
      * 根据文件名搜索文件<br/>
      * 详细的请求配置请参考：{@link SearchRequest}
      *
+     * @param fileName     文件名
+     * @param orderByEnum        根据什么排序，如名称、创建时间。。。
+     * @param orderDirectionEnum 排序方向，升序排列或降序
+     * @return 搜索响应结果。
+     */
+    protected Object search(String fileName, OrderByEnum orderByEnum, OrderDirectionEnum orderDirectionEnum) {
+        return search(fileName, CategoryEnum.ALL, orderByEnum, orderDirectionEnum);
+    }
+
+    /**
+     * 根据文件名搜索文件<br/>
+     * 详细的请求配置请参考：{@link SearchRequest}
+     *
      * @param fileName           文件名
      * @param categoryEnum       搜索的文件类型，如，图片、视频。。。
      * @param orderByEnum        根据什么排序，如名称、创建时间。。。
@@ -213,6 +226,18 @@ abstract class AbstractTemplate {
     }
 
     /**
+     * 创建文件夹，在默认的顶级目录<br/>
+     * 详细的请求参数请参考：{@link CreateFolderRequest}
+     *
+     * @param name         文件夹名
+     * @param checkNameEnum 同名策略
+     * @return 响应信息
+     */
+    protected Object createFolder(String name, CheckNameEnum checkNameEnum) {
+        return createFolder(DEFAULT_TOP_DIRECTORY, name, checkNameEnum);
+    }
+
+    /**
      * 创建文件夹<br/>
      * 详细的请求参数请参考：{@link CreateFolderRequest}
      *
@@ -256,6 +281,17 @@ abstract class AbstractTemplate {
      */
     protected Object uploadFile(Path path, String parentFileId) {
         return uploadFile(path, parentFileId, CheckNameEnum.AUTO_RENAME);
+    }
+
+    /**
+     * 上传文件，使用默认的顶级目录（支持快传和分片上传）
+     *
+     * @param path         文件路径
+     * @param checkNameEnum 同名策略
+     * @return 响应信息
+     */
+    protected Object uploadFile(Path path, CheckNameEnum checkNameEnum) {
+        return uploadFile(path, DEFAULT_TOP_DIRECTORY, checkNameEnum);
     }
 
     /**

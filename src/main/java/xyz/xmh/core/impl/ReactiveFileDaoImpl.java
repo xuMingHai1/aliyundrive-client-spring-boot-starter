@@ -36,6 +36,7 @@ import java.net.HttpURLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -139,6 +140,9 @@ public class ReactiveFileDaoImpl implements ReactiveFileDao {
 
     @Override
     public Mono<CreateFileResponse> uploadFile(String parentFileId, Path path, CheckNameEnum checkNameEnum) {
+        if (!Files.isRegularFile(path)) {
+            throw new IllegalArgumentException("这个路径不是普通文件：" + path);
+        }
         // 初始化请求参数
         final CreateFileRequest createFileRequest = new CreateFileRequest();
         createFileRequest.setParentFileId(parentFileId);

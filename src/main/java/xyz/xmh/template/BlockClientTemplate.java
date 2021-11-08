@@ -161,6 +161,20 @@ public class BlockClientTemplate extends AbstractTemplate {
      * 详细的请求配置请参考：{@link SearchRequest}
      *
      * @param fileName           文件名
+     * @param orderByEnum        根据什么排序，如名称、创建时间。。。
+     * @param orderDirectionEnum 排序方向，升序排列或降序
+     * @return 搜索响应结果。
+     */
+    @Override
+    protected SearchResponse search(String fileName, OrderByEnum orderByEnum, OrderDirectionEnum orderDirectionEnum) {
+        return (SearchResponse) super.search(fileName, orderByEnum, orderDirectionEnum);
+    }
+
+    /**
+     * 根据文件名搜索文件<br/>
+     * 详细的请求配置请参考：{@link SearchRequest}
+     *
+     * @param fileName           文件名
      * @param categoryEnum       搜索的文件类型，如，图片、视频。。。
      * @param orderByEnum        根据什么排序，如名称、创建时间。。。
      * @param orderDirectionEnum 排序方向，如降序、升序
@@ -242,6 +256,19 @@ public class BlockClientTemplate extends AbstractTemplate {
     }
 
     /**
+     * 创建文件夹，在默认的顶级目录<br/>
+     * 详细的请求参数请参考：{@link CreateFolderRequest}
+     *
+     * @param name          文件夹名
+     * @param checkNameEnum 同名策略
+     * @return 响应信息
+     */
+    @Override
+    protected CreateFolderResponse createFolder(String name, CheckNameEnum checkNameEnum) {
+        return (CreateFolderResponse) super.createFolder(name, checkNameEnum);
+    }
+
+    /**
      * 创建文件夹<br/>
      * 详细的请求参数请参考：{@link CreateFolderRequest}
      *
@@ -290,6 +317,18 @@ public class BlockClientTemplate extends AbstractTemplate {
     }
 
     /**
+     * 上传文件，使用默认的顶级目录（支持快传和分片上传）
+     *
+     * @param path          文件路径
+     * @param checkNameEnum 同名策略
+     * @return 响应信息
+     */
+    @Override
+    protected CreateFileResponse uploadFile(Path path, CheckNameEnum checkNameEnum) {
+        return (CreateFileResponse) super.uploadFile(path, checkNameEnum);
+    }
+
+    /**
      * 上传文件（支持快传和分片上传）
      *
      * @param path          文件路径
@@ -300,6 +339,46 @@ public class BlockClientTemplate extends AbstractTemplate {
     @Override
     public CreateFileResponse uploadFile(Path path, String parentFileId, CheckNameEnum checkNameEnum) {
         return blockExecutor.uploadFile(parentFileId, path, checkNameEnum);
+    }
+
+    /**
+     * 上传文件夹
+     * @param path 文件夹路径
+     * @return 上传文件夹的响应
+     */
+    public UploadFolderResponse uploadFolder(Path path) {
+        return uploadFolder(path, DEFAULT_TOP_DIRECTORY);
+    }
+
+    /**
+     * 上传文件夹
+     * @param path 文件夹路径
+     * @param parentFileId 父文件ID
+     * @return 上传文件夹的响应
+     */
+    public UploadFolderResponse uploadFolder(Path path, String parentFileId) {
+        return uploadFolder(path, parentFileId, CheckNameEnum.AUTO_RENAME);
+    }
+
+    /**
+     * 上传文件夹
+     * @param path 文件夹路径
+     * @param checkNameEnum 同名策略
+     * @return 上传文件夹的响应
+     */
+    public UploadFolderResponse uploadFolder(Path path, CheckNameEnum checkNameEnum) {
+        return uploadFolder(path, DEFAULT_TOP_DIRECTORY, checkNameEnum);
+    }
+
+    /**
+     * 上传文件夹
+     * @param path 文件夹路径
+     * @param parentFileId 父文件ID
+     * @param checkNameEnum 同名策略
+     * @return 上传文件夹的响应
+     */
+    public UploadFolderResponse uploadFolder(Path path, String parentFileId, CheckNameEnum checkNameEnum) {
+        return blockExecutor.uploadFolder(path, parentFileId, checkNameEnum);
     }
 
     /**

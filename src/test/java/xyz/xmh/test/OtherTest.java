@@ -22,7 +22,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
-import java.util.Collections;
 
 /**
  * 2021/10/29 19:33 星期五<br/>
@@ -70,21 +69,24 @@ public class OtherTest {
         aFile.setParentFileId(rootFolder.getFileId());
         aFile.setFileName("aFile");
         aFile.setFileId(rootFolder.getFileId() + "_" + aFile.getFileName());
-        rootFolder.setFileList(Collections.singletonList(aFile));
+        aFile.setParentFolder(rootFolder);
+        rootFolder.addFile(aFile);
 
         // 顶级目录下存在的目录 test目录
         final UploadFolderResponse.Folder testFolder = new UploadFolderResponse.Folder();
         testFolder.setParentFileId(rootFolder.getFileId());
         testFolder.setFileName("test");
         testFolder.setFileId(rootFolder.getFileId() + "-" + testFolder.getFileName());
-        rootFolder.setFolderList(Collections.singletonList(testFolder));
+        testFolder.setParentFolder(rootFolder);
+        rootFolder.addFolder(testFolder);
 
         // test目录下的文件
         final UploadFolderResponse.File bFile = new UploadFolderResponse.File();
         bFile.setParentFileId(testFolder.getFileId());
         bFile.setFileName("bFile");
         bFile.setFileId(testFolder.getFileId() + "_" + bFile.getFileName());
-        testFolder.setFileList(Collections.singletonList(bFile));
+        bFile.setParentFolder(testFolder);
+        testFolder.addFile(bFile);
 
 
         System.out.println(uploadFolderResponse);

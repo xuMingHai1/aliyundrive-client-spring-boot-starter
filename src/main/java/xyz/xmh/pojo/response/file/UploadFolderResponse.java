@@ -15,9 +15,12 @@ package xyz.xmh.pojo.response.file;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.Data;
 
-import java.util.List;
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * 2021/11/2 13:38 星期二<br/>
@@ -38,8 +41,7 @@ public class UploadFolderResponse {
     /**
      * 文件抽象类，定义了文件夹和文件的共同属性
      */
-    @Data
-    abstract static class AbstractFile {
+    private abstract static class AbstractFile implements Serializable {
         /**
          * 明确的类型，文件夹或文件
          */
@@ -57,20 +59,116 @@ public class UploadFolderResponse {
          */
         private String fileName;
 
-        AbstractFile(String type) {
-            this.type = type;
+        /**
+         * 上传文件所在的本地系统的路径
+         */
+        private Path path;
+
+        /**
+         * 父目录的引用
+         */
+        private Folder parentFolder;
+
+        /**
+         * 上传开始时间，在创建对象时赋值
+         */
+        private final LocalDateTime uploadStartTime;
+
+        /**
+         * 上传结束时间
+         */
+        private LocalDateTime uploadEndTime;
+
+        /**
+         * 父目录的hashCode，防止子类调用toString时导致递归问题
+         */
+        private transient int parentFolderHashCode;
+
+        public String getType() {
+            return type;
         }
 
+        public String getParentFileId() {
+            return parentFileId;
+        }
+
+        public void setParentFileId(String parentFileId) {
+            this.parentFileId = parentFileId;
+        }
+
+        public String getFileId() {
+            return fileId;
+        }
+
+        public void setFileId(String fileId) {
+            this.fileId = fileId;
+        }
+
+        public String getFileName() {
+            return fileName;
+        }
+
+        public void setFileName(String fileName) {
+            this.fileName = fileName;
+        }
+
+        public Path getPath() {
+            return path;
+        }
+
+        public void setPath(Path path) {
+            this.path = path;
+        }
+
+        public Folder getParentFolder() {
+            return parentFolder;
+        }
+
+        public void setParentFolder(Folder parentFolder) {
+            this.parentFolder = parentFolder;
+            Optional.ofNullable(parentFolder).ifPresent(folder1 -> this.parentFolderHashCode = folder1.hashCode());
+        }
+
+        public LocalDateTime getUploadStartTime() {
+            return uploadStartTime;
+        }
+
+        public LocalDateTime getUploadEndTime() {
+            return uploadEndTime;
+        }
+
+        public void setUploadEndTime(LocalDateTime uploadEndTime) {
+            this.uploadEndTime = uploadEndTime;
+        }
+
+        protected AbstractFile(String type) {
+            this.type = type;
+            this.uploadStartTime = LocalDateTime.now();
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", "", "")
+                    .add("type='" + type + "'")
+                    .add("parentFileId='" + parentFileId + "'")
+                    .add("fileId='" + fileId + "'")
+                    .add("fileName='" + fileName + "'")
+                    .add("path=" + path)
+                    /*
+                        防止递归过深，出现StackOverflowError
+                        使用临时的变量，预防父目录为null调用hashCode方法出现异常
+                     */
+                    .add("parentFolderHashCode=" + parentFolderHashCode)
+                    .add("uploadStartTime=" + uploadStartTime)
+                    .add("uploadEndTime=" + uploadEndTime)
+                    .toString();
+        }
     }
 
     /**
      * 文件夹类
      */
-    @Getter
-    @Setter
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static class Folder extends AbstractFile {
+    public final static class Folder extends AbstractFile {
 
         /**
          * 文件夹中存在的文件夹
@@ -89,16 +187,61 @@ public class UploadFolderResponse {
             super("folder");
         }
 
+        public List<Folder> getFolderList() {
+            return folderList;
+        }
+
+        public void setFolderList(List<Folder> folderList) {
+            this.folderList = folderList;
+        }
+
+        public List<File> getFileList() {
+            return fileList;
+        }
+
+        public void setFileList(List<File> fileList) {
+            this.fileList = fileList;
+        }
+
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", Folder.class.getSimpleName() + "[", "]")
+                    .add(super.toString())
+                    .add("folderList.size()=" + Optional.ofNullable(folderList).orElse(Collections.emptyList()).size())
+                    .add("fileList.size()=" + Optional.ofNullable(fileList).orElse(Collections.emptyList()).size())
+                    .toString();
+        }
+
+
+        /**
+         * 给当前文件夹添加文件夹<br/>
+         * 如果文件夹集合还未初始化会先初始化再添加，如果已经初始化，则直接添加
+         * @param folder 文件夹类
+         */
+        public void addFolder(Folder folder) {
+            Objects.requireNonNull(folder, "添加的文件夹类不能为null");
+            folderList = Optional.ofNullable(folderList).orElse(new ArrayList<>());
+            folderList.add(folder);
+        }
+
+        /**
+         * 给当前文件夹添加文件类<br/>
+         * 如果文件集合还未初始化会先初始化再添加，如果已经初始化，则直接添加
+         * @param file 要添加的文件类
+         */
+        public void addFile(File file) {
+            Objects.requireNonNull(file, "添加的文件类不能为null");
+            fileList = Optional.ofNullable(fileList).orElse(new ArrayList<>());
+            fileList.add(file);
+        }
+
     }
 
     /**
      * 文件类
      */
-    @Getter
-    @Setter
-    @EqualsAndHashCode(callSuper = true)
-    @ToString(callSuper = true)
-    public static class File extends AbstractFile {
+    public final static class File extends AbstractFile {
 
         /**
          * 是否快传
@@ -112,6 +255,21 @@ public class UploadFolderResponse {
             super("file");
         }
 
+        public boolean isRapidUpload() {
+            return rapidUpload;
+        }
+
+        public void setRapidUpload(boolean rapidUpload) {
+            this.rapidUpload = rapidUpload;
+        }
+
+        @Override
+        public String toString() {
+            return new StringJoiner(", ", File.class.getSimpleName() + "[", "]")
+                    .add(super.toString())
+                    .add("rapidUpload=" + rapidUpload)
+                    .toString();
+        }
     }
 
 }

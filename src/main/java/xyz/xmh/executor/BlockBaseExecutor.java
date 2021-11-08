@@ -25,6 +25,7 @@ import xyz.xmh.pojo.response.file.*;
 
 import java.io.IOException;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -83,7 +84,8 @@ public class BlockBaseExecutor implements BlockExecutor {
             final URLConnection connection = downloadUrl.getUrl().openConnection();
             connection.setRequestProperty(HttpHeaders.REFERER, "https://www.aliyundrive.com/");
             final ReadableByteChannel readableByteChannel = Channels.newChannel(connection.getInputStream());
-            final String fileName = connection.getHeaderField(HttpHeaders.CONTENT_DISPOSITION).split("''")[1];
+            final String[] split = connection.getHeaderField(HttpHeaders.CONTENT_DISPOSITION).split("=")[1].split("''");
+            final String fileName = URLDecoder.decode(split[1], split[0]);
             final FileChannel fileChannel = FileChannel.open(path.resolve(fileName), openOptions);
             final long l = fileChannel.transferFrom(readableByteChannel, 0, downloadUrl.getSize());
             if (l != downloadUrl.getSize()) {

@@ -20,16 +20,18 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import xyz.xmh.autoconfigure.CacheAutoConfiguration;
 import xyz.xmh.autoconfigure.ClientAutoConfiguration;
 import xyz.xmh.pojo.entity.BaseItem;
 import xyz.xmh.pojo.response.file.CreateFileResponse;
+import xyz.xmh.pojo.response.file.UploadFolderResponse;
 import xyz.xmh.template.BlockClientTemplate;
 
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -67,10 +69,10 @@ public class BlockClientTest {
      */
     @Test
     void testSearch() {
-        // 循环获取测试缓存
-        for (int i = 0; i < 10; i++) {
-            System.out.println(blockClientTemplate.search("1"));
-        }
+        System.out.println(blockClientTemplate.search("1"));
+        System.out.println(blockClientTemplate.search("2"));
+        System.out.println(blockClientTemplate.search("3"));
+        System.out.println(blockClientTemplate.search("1"));
     }
 
     /**
@@ -86,17 +88,43 @@ public class BlockClientTest {
     }
 
     /**
-     * 测试上传文件
+     * 测试上传文件，错误的测试，查看错误响应
      */
     @Test
     @Order(2)
     void testUpload() {
+        final CreateFileResponse createFileResponse = blockClientTemplate.uploadFile(Paths.get("README.md"), "sfs");
+        log.info("是否快传：{}", createFileResponse.isRapidUpload());
+        log.info("上传文件所在的目录id: {}", createFileResponse.getParentFileId());
+
+    }
+
+    /**
+     * 测试上传目录
+     */
+    @Test
+    @Order(3)
+    void testUploadFolder() {
+        final ExecutorService executorService = Executors.newFixedThreadPool(3);
+        for (int i = 0; i < 3; i++) {
+            executorService.execute(() -> {
+                final UploadFolderResponse uploadFolderResponse = blockClientTemplate.uploadFolder(Paths.get(""));
+                System.out.println("--------------------------------文件夹上传响应-------------------------------------");
+                System.out.println(uploadFolderResponse);
+                System.out.println("--------------------------------文件夹上传响应的文件夹集合-------------------------------------");
+                System.out.println(uploadFolderResponse.getFolder().getFolderList());
+                System.out.println("--------------------------------文件夹上传响应的文件集合-------------------------------------");
+                System.out.println(uploadFolderResponse.getFolder().getFileList());
+            });
+        }
+
+        executorService.shutdown();
         try {
-            final CreateFileResponse createFileResponse = blockClientTemplate.uploadFile(Paths.get("README.md"));
-            log.info("是否快传：{}", createFileResponse.isRapidUpload());
-            log.info("上传文件所在的目录id: {}", createFileResponse.getParentFileId());
-        } catch (WebClientResponseException e) {
-            System.out.println(e.getResponseBodyAsString());
+            if (!executorService.awaitTermination(3, TimeUnit.MINUTES)) {
+                log.info("没有在规定时间上传完成");
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
     }

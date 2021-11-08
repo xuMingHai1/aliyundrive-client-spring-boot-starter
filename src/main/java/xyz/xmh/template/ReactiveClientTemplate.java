@@ -164,6 +164,20 @@ public class ReactiveClientTemplate extends AbstractTemplate {
      * 详细的请求配置请参考：{@link SearchRequest}
      *
      * @param fileName           文件名
+     * @param orderByEnum        根据什么排序，如名称、创建时间。。。
+     * @param orderDirectionEnum 排序方向，升序排列或降序
+     * @return 搜索响应结果。
+     */
+    @Override
+    protected Mono<ResponseEntity<SearchResponse>> search(String fileName, OrderByEnum orderByEnum, OrderDirectionEnum orderDirectionEnum) {
+        return (Mono<ResponseEntity<SearchResponse>>) super.search(fileName, orderByEnum, orderDirectionEnum);
+    }
+
+    /**
+     * 根据文件名搜索文件<br/>
+     * 详细的请求配置请参考：{@link SearchRequest}
+     *
+     * @param fileName           文件名
      * @param categoryEnum       搜索的文件类型，如，图片、视频。。。
      * @param orderByEnum        根据什么排序，如名称、创建时间。。。
      * @param orderDirectionEnum 排序方向，升序排列或降序
@@ -244,6 +258,19 @@ public class ReactiveClientTemplate extends AbstractTemplate {
     }
 
     /**
+     * 创建文件夹，在默认的顶级目录<br/>
+     * 详细的请求参数请参考：{@link CreateFolderRequest}
+     *
+     * @param name          文件夹名
+     * @param checkNameEnum 同名策略
+     * @return 响应信息
+     */
+    @Override
+    protected Mono<ResponseEntity<CreateFolderResponse>> createFolder(String name, CheckNameEnum checkNameEnum) {
+        return (Mono<ResponseEntity<CreateFolderResponse>>) super.createFolder(name, checkNameEnum);
+    }
+
+    /**
      * 创建文件夹<br/>
      * 详细的请求参数请参考：{@link CreateFolderRequest}
      *
@@ -289,6 +316,18 @@ public class ReactiveClientTemplate extends AbstractTemplate {
     @Override
     public Mono<CreateFileResponse> uploadFile(Path path, String parentFileId) {
         return (Mono<CreateFileResponse>) super.uploadFile(path, parentFileId);
+    }
+
+    /**
+     * 上传文件，使用默认的顶级目录（支持快传和分片上传）
+     *
+     * @param path          文件路径
+     * @param checkNameEnum 同名策略
+     * @return 响应信息
+     */
+    @Override
+    protected Mono<CreateFileResponse> uploadFile(Path path, CheckNameEnum checkNameEnum) {
+        return (Mono<CreateFileResponse>) super.uploadFile(path, checkNameEnum);
     }
 
     /**

@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ClientCodecConfigurer;
@@ -55,6 +56,7 @@ import java.util.function.Consumer;
 @ConditionalOnClass(WebClient.class)
 @AutoConfigureAfter(CacheAutoConfiguration.class)
 @Slf4j
+@EnableAspectJAutoProxy
 public class ClientAutoConfiguration {
 
     private final WebClient webClient;
@@ -112,7 +114,7 @@ public class ClientAutoConfiguration {
 
     @Bean
     @ConditionalOnBean({Cache.class, ReactiveFileDao.class, ReactiveRecycleDao.class})
-    public BlockClientTemplate clientTemplate(Cache cache, ReactiveFileDao reactiveFileDao, ReactiveRecycleDao reactiveRecycleDao) {
+    public BlockClientTemplate blockClientTemplate(Cache cache, ReactiveFileDao reactiveFileDao, ReactiveRecycleDao reactiveRecycleDao) {
         return new BlockClientTemplate(cache, reactiveFileDao, reactiveRecycleDao);
     }
 
@@ -120,6 +122,11 @@ public class ClientAutoConfiguration {
     @ConditionalOnBean({Cache.class, ReactiveFileDao.class, ReactiveRecycleDao.class})
     public ReactiveClientTemplate reactiveClientTemplate(Cache cache, ReactiveFileDao reactiveFileDao, ReactiveRecycleDao reactiveRecycleDao) {
         return new ReactiveClientTemplate(cache, reactiveFileDao, reactiveRecycleDao);
+    }
+
+    @Bean
+    public ClientAspect clientAspect() {
+        return new ClientAspect();
     }
 
     private void scheduled() {

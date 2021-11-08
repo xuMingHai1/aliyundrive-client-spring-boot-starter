@@ -12,7 +12,6 @@
 
 package xyz.xmh.util;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import xyz.xmh.autoconfigure.TokenStatic;
 
 import java.io.IOException;
@@ -20,6 +19,7 @@ import java.io.RandomAccessFile;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 
 /**
  * 2021/10/20 4:51 星期三<br/>
@@ -59,8 +59,7 @@ public final class ProofV1Utils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return Base64.encode(bytes);
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
 

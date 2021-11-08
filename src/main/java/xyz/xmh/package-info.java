@@ -11,9 +11,12 @@
  */
 
 /**
- * 用于声明参数和返回值在默认情况下对于给定的包被视为不可为空
+ * 用于声明参数和返回值在默认情况下对于给定的包被视为不可为空。<br/>
+ * 用于声明对于给定的包，默认情况下字段将被视为不可为空。
  */
 @NonNullApi
-package xyz.xmh.template;
+@NonNullFields
+package xyz.xmh;
 
 import org.springframework.lang.NonNullApi;
+import org.springframework.lang.NonNullFields;

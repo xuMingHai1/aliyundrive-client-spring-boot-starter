@@ -113,6 +113,12 @@ public class BlockCacheExecutor implements BlockExecutor {
     }
 
     @Override
+    public UploadFolderResponse uploadFolder(Path path, String parentFileId, CheckNameEnum checkNameEnum) {
+        cache.clear();
+        return blockExecutor.uploadFolder(path, parentFileId, checkNameEnum);
+    }
+
+    @Override
     public Boolean trash(String fileId) {
         cache.clear();
         return blockExecutor.trash(fileId);

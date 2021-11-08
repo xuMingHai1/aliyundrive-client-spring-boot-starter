@@ -14,8 +14,8 @@ package xyz.xmh.io;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.util.ObjectUtils;
 import xyz.xmh.pojo.response.file.DownloadUrlResponse;
@@ -73,17 +73,10 @@ public class DownloadResource extends InputStreamResource {
      */
     public static DownloadResource createResource(DownloadUrlResponse downloadUrlResponse, HttpHeaders requestHttpHeaders) throws IOException {
         final URLConnection urlConnection = downloadUrlResponse.getUrl().openConnection();
-        urlConnection.setRequestProperty(HttpHeaders.REFERER, "https://www.aliyundrive.com/");
 
-        // 设置范围下载
-        if (!requestHttpHeaders.getRange().isEmpty()) {
-            urlConnection.setRequestProperty(HttpHeaders.RANGE, HttpRange.toString(requestHttpHeaders.getRange()));
-            // 设置资源为变更，中断重下
-            final List<String> list = requestHttpHeaders.get(HttpHeaders.IF_RANGE);
-            if (!ObjectUtils.isEmpty(list)) {
-                urlConnection.setRequestProperty(HttpHeaders.IF_RANGE, list.toString());
-            }
-        }
+        // 设置请求头信息
+        requestHttpHeaders.forEach((key, valueList) -> valueList.forEach(value -> urlConnection.addRequestProperty(key, value)));
+        urlConnection.setRequestProperty(HttpHeaders.REFERER, "https://www.aliyundrive.com/");
         return new DownloadResource(urlConnection.getInputStream(), urlConnection, downloadUrlResponse);
     }
 
@@ -106,6 +99,7 @@ public class DownloadResource extends InputStreamResource {
         return responseHttpHeaders;
     }
 
+    @NonNull
     @Override
     public URL getURL() {
         return urlConnection.getURL();
