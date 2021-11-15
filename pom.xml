@@ -18,7 +18,7 @@
 
     <groupId>xyz.xuminghai</groupId>
     <artifactId>aliyundrive-client-spring-boot-starter</artifactId>
-    <version>0.0.4-alpha</version>
+    <version>0.0.5-alpha</version>
     <packaging>jar</packaging>
 
     <description>这是一个基于WebFlux.WebClient的阿里云盘客户端</description>

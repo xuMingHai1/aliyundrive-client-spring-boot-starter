@@ -35,7 +35,10 @@ import java.time.Instant;
 @Slf4j
 class ClientAspect {
 
-    @Around("target(xyz.xuminghai.template.ReactiveClientTemplate)")
+    @Pointcut("execution(public * getCache())")
+    private void excludePointcut() {}
+
+    @Around("target(xyz.xuminghai.template.ReactiveClientTemplate) && !excludePointcut()")
     private Object reactiveClientTemplateArdound(ProceedingJoinPoint pjp) throws Throwable {
         // 执行开始的时间戳
         final Instant startTime = Instant.now();
@@ -51,7 +54,7 @@ class ClientAspect {
         }).doOnNext(o -> log.info("【{}#{}】执行成功耗时：{}", signature.getDeclaringTypeName(), signature.getName(), DurationUtils.between(startTime, Instant.now())));
     }
 
-    @Pointcut("target(xyz.xuminghai.template.BlockClientTemplate)")
+    @Pointcut("target(xyz.xuminghai.template.BlockClientTemplate) && !excludePointcut()")
     private void blockClientTemplatePointcut() {
     }
 

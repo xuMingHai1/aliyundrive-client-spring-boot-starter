@@ -16,8 +16,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import xyz.xuminghai.cache.AbstractCacheInstance;
 import xyz.xuminghai.cache.BaseCache;
-import xyz.xuminghai.serializer.KryoSerializer;
-import xyz.xuminghai.serializer.Serializer;
 
 import java.util.ArrayList;
 import java.util.List;

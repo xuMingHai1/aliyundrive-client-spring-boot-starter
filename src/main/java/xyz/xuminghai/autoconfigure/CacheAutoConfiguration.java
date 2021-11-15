@@ -13,13 +13,11 @@
 package xyz.xuminghai.autoconfigure;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
-import xyz.xuminghai.cache.AbstractCacheInstance;
 import xyz.xuminghai.cache.BaseCache;
 import xyz.xuminghai.cache.Cache;
 import xyz.xuminghai.cache.NullCache;
@@ -29,8 +27,6 @@ import xyz.xuminghai.cache.decorator.ScheduledDecorator;
 import xyz.xuminghai.serializer.KryoSerializer;
 import xyz.xuminghai.serializer.Serializer;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
