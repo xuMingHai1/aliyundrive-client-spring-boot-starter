@@ -32,6 +32,9 @@ QQ交流群：776339385
 refresh_token获取说明
 ![refresh_token获取说明](https://images.gitee.com/uploads/images/2021/1010/175912_b1196636_8492227.png "屏幕截图.png")
 
+依赖配置示例：
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1115/214738_deb6ff0f_8492227.png "屏幕截图.png")
+
 一般只需要在配置文件里加上refresh_token就可以了
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1112/024254_d5bcfa85_8492227.png "屏幕截图.png")
 
