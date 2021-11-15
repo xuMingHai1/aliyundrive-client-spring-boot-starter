@@ -21,20 +21,9 @@ import java.util.Map;
  *
  * @author xuMingHai
  */
-public class BaseCache extends AbstractCacheInstance implements Cache {
-
-    private final String name;
+public class BaseCache extends AbstractCacheInstance {
 
     private final Map<Object, Object> cache = new HashMap<>();
-
-    public BaseCache(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
 
     @Override
     public void put(Object key, Object value) {
@@ -47,8 +36,8 @@ public class BaseCache extends AbstractCacheInstance implements Cache {
     }
 
     @Override
-    public Object remove(Object key) {
-        return cache.remove(key);
+    public void remove(Object key) {
+        cache.remove(key);
     }
 
     @Override
@@ -57,7 +46,7 @@ public class BaseCache extends AbstractCacheInstance implements Cache {
     }
 
     @Override
-    public int size() {
+    public long size() {
         return cache.size();
     }
 }

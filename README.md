@@ -2,37 +2,38 @@
 
 #### 介绍
 
-使用webflux的webClient访问阿里云盘。提供程序员简单好用的api来使用阿里云盘，添加了默认的缓存实现，和开放的接口可以自定义缓存实现，使用SpringBoot的自动装配，可以很方便的进行配置。使用起来简单快捷，相当于拥有1T或者更多的OSS对象存储；各位觉得可以不妨一起来开发！！！
+这是基于webflux.WebClient开发的阿里云盘客户端。提供简单好用的方法来使用阿里云盘，内部使用了缓存来提升性能，还可以自定义缓存实例，使用SpringBoot的自动装配，无需复杂的配置，开箱即用。大家觉得不错，欢迎一起参与开发！！！
 
 #### 软件架构
+QQ交流群：776339385
 
-采用了从下到上的架构，最底层封装阿里云盘接口的访问，再由中间的执行器对数据进行处理，最后到达模板类，扩展使用方法。使用springboot的自动装配，使用的Reactive很适合高并发的访问，参照了mybatis的缓存
+整体使用从里到外的扩展架构，最底层封装阿里云盘接口的访问，再由中间的执行器对访问进一步的增强，最后模板类进行方法的拓展。
+
 
 #### 安装教程
 
-QQ交流群：776339385
+在pom文件中引入这个依赖。
 
-现在已经完成了基本实现，可以很方便地上手使用，目前有两个Template，只需要自动注入其中一个就能调用方法来使用阿里云盘了。代码清晰易懂，说明文档充分。
+只需要这一个依赖就可以是springboot项目，因为其内部引入了springboot-webflux
 
-自动装配需要这个依赖
 
 ```xml
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-        </dependency>
+<dependency>
+    <groupId>xyz.xuminghai</groupId>
+    <artifactId>aliyundrive-client-spring-boot-starter</artifactId>
+    <version>0.0.4-alpha</version>
+</dependency>
 ```
 
 #### 使用说明
 
-旁边那个发行版，将其中的三个jar包导入就可以了（分别是源代码，文档，编译后的）
 
 refresh_token获取说明
 ![refresh_token获取说明](https://images.gitee.com/uploads/images/2021/1010/175912_b1196636_8492227.png "屏幕截图.png")
-依赖配置，只需要这一个依赖就可以运行了，推荐使用高版本的SpringBoot
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1028/110440_94727d84_8492227.png "屏幕截图.png")
-普通情况下，只需要在配置文件里加上refresh_token就可以了
-![普通情况下，只需要在配置文件里加上refresh_token就可以了](https://images.gitee.com/uploads/images/2021/1027/005251_3f6085ee_8492227.png "屏幕截图.png")
+
+只需要在配置文件里加上refresh_token就可以了
+![输入图片说明](https://images.gitee.com/uploads/images/2021/1112/024254_d5bcfa85_8492227.png "屏幕截图.png")
+
 目前还添加了这些配置，有访问请求的webClient配置，和缓存实例装饰器配置，还有自定义缓存实例
 ![输入图片说明](https://images.gitee.com/uploads/images/2021/1027/005601_3874f264_8492227.png "屏幕截图.png")
 配置简单方便，十分人性化！

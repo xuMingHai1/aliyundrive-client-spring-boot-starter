@@ -17,7 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import xyz.xuminghai.cache.Cache;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
@@ -28,7 +27,6 @@ import xyz.xuminghai.pojo.request.file.UpdateRequest;
 import xyz.xuminghai.pojo.response.file.*;
 
 import java.nio.file.Path;
-import java.time.Duration;
 
 /**
  * 2021/10/25 16:39 星期一<br/>
@@ -52,24 +50,14 @@ public class ReactiveCacheExecutor implements ReactiveExecutor {
     @Override
     public Mono<ResponseEntity<ListResponse>> list(ListRequest listRequest) {
         final String key = "reactive_list_" + listRequest.hashCode();
-        final Object o = cache.get(key);
+        final ResponseEntity<ListResponse> listResponseEntity = (ResponseEntity<ListResponse>) cache.get(key);
         Mono<ResponseEntity<ListResponse>> mono;
 
-        if (ObjectUtils.isEmpty(o)) {
+        if (ObjectUtils.isEmpty(listResponseEntity)) {
             mono = reactiveExecutor.list(listRequest)
-                    .cache(listResponseResponseEntity -> Duration.ofMillis(Long.MAX_VALUE),
-                            throwable -> {
-                                cache.remove(key);
-                                return Duration.ZERO;
-                            },
-                            () -> {
-                                cache.remove(key);
-                                return Duration.ZERO;
-                            },
-                            Schedulers.parallel());
-            cache.put(key, mono);
+                    .doOnNext(responseEntity -> cache.put(key, responseEntity));
         } else {
-            mono = (Mono<ResponseEntity<ListResponse>>) o;
+            mono = Mono.just(listResponseEntity);
         }
 
         return mono;
@@ -80,24 +68,14 @@ public class ReactiveCacheExecutor implements ReactiveExecutor {
     @Override
     public Mono<ResponseEntity<SearchResponse>> search(SearchRequest searchRequest) {
         final String key = "reactive_search_" + searchRequest.hashCode();
-        final Object o = cache.get(key);
+        final ResponseEntity<SearchResponse> searchResponseEntity = (ResponseEntity<SearchResponse>) cache.get(key);
         Mono<ResponseEntity<SearchResponse>> mono;
 
-        if (ObjectUtils.isEmpty(o)) {
+        if (ObjectUtils.isEmpty(searchResponseEntity)) {
             mono = reactiveExecutor.search(searchRequest)
-                    .cache(searchResponseResponseEntity -> Duration.ofMillis(Long.MAX_VALUE),
-                            throwable -> {
-                                cache.remove(key);
-                                return Duration.ZERO;
-                            },
-                            () -> {
-                                cache.remove(key);
-                                return Duration.ZERO;
-                            },
-                            Schedulers.parallel());
-            cache.put(key, mono);
+                    .doOnNext(responseEntity -> cache.put(key, responseEntity));
         } else {
-            mono = (Mono<ResponseEntity<SearchResponse>>) o;
+            mono = Mono.just(searchResponseEntity);
         }
 
         return mono;
@@ -107,24 +85,14 @@ public class ReactiveCacheExecutor implements ReactiveExecutor {
     @Override
     public Mono<ResponseEntity<BaseItem>> get(String fileId) {
         final String key = "reactive_get_" + fileId;
-        final Object o = cache.get(key);
+        final ResponseEntity<BaseItem> getResponseEntity = (ResponseEntity<BaseItem>) cache.get(key);
         Mono<ResponseEntity<BaseItem>> mono;
 
-        if (ObjectUtils.isEmpty(o)) {
+        if (ObjectUtils.isEmpty(getResponseEntity)) {
             mono = reactiveExecutor.get(fileId)
-                    .cache(baseItemResponseEntity -> Duration.ofMillis(Long.MAX_VALUE),
-                            throwable -> {
-                                cache.remove(key);
-                                return Duration.ZERO;
-                            },
-                            () -> {
-                                cache.remove(key);
-                                return Duration.ZERO;
-                            },
-                            Schedulers.parallel());
-            cache.put(key, mono);
+                    .doOnNext(responseEntity -> cache.put(key, responseEntity));
         } else {
-            mono = (Mono<ResponseEntity<BaseItem>>) o;
+            mono = Mono.just(getResponseEntity);
         }
 
         return mono;

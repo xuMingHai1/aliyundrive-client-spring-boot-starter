@@ -14,25 +14,12 @@ package xyz.xuminghai.cache;
 
 /**
  * 2021/10/21 11:00 星期四<br/>
- * 缓存接口，自定义缓存策略请实现这个接口和继承缓存实例类<br/>
- * 比如：使用Redis作为缓存<br/>
- * 必须要创建一个带有缓存名称的构造器，例如：<br/>
- * <pre>
- *  public MyCache(final String name) {
- *       if (name == null) {
- *         throw new IllegalArgumentException("Cache instances require an cacheName");
- *       }
- *       this.name = name;
- *        initialize();
- *     }
- * </pre>
- * <p>
+ * 缓存接口，定义缓存功能<br/>
  * 借鉴自mybatis
  *
  * @author xuMingHai
  */
 public interface Cache {
-
 
     /**
      * 获取缓存名
@@ -59,14 +46,12 @@ public interface Cache {
 
     /**
      * 删除指定的缓存
-     *
      * @param key 请求
-     * @return 之前请求的内容，如果不存在则为null
      */
-    Object remove(Object key);
+    void remove(Object key);
 
     /**
-     * 清除这个缓存实例
+     * 清空所有缓存
      */
     void clear();
 
@@ -75,7 +60,7 @@ public interface Cache {
      *
      * @return 缓存元素的个数
      */
-    int size();
+    long size();
 
 
 }

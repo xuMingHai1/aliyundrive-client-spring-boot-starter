@@ -10,30 +10,29 @@
  * See the Mulan PSL v2 for more details.
  */
 
-package xyz.xuminghai.cache;
+package xyz.xuminghai.serializer;
 
 /**
- * 2021/10/26 21:33 星期二<br/>
- * 抽象的缓存实例模板类，自定义缓存实例需要继承这个模板类
- *
+ * 2021/11/15 16:45 星期一<br/>
+ * 序列化器接口，定义了序列化的功能
  * @author xuMingHai
  */
-public abstract class AbstractCacheInstance implements Cache {
+public interface Serializer {
 
-    private final String name;
-
-    public AbstractCacheInstance() {
-        this.name = this.getClass().getSimpleName();
-    }
+    byte[] EMPTY_ARRAY = new byte[0];
 
     /**
-     * 获取缓存名
-     * @return 缓存名
+     * 将对象序列化为字节数组
+     * @param o 要进行序列化的对象
+     * @return 序列化的结果
      */
-    @Override
-    public String getName() {
-        return this.name;
-    }
+    byte[] serialize(Object o);
 
+    /**
+     * 将字节数组反序列化为对象
+     * @param bytes 要进行反序列化的数组
+     * @return 反序列化的对象
+     */
+    Object deserialize(byte[] bytes);
 
 }

@@ -19,9 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import xyz.xuminghai.autoconfigure.CacheAutoConfiguration;
-import xyz.xuminghai.autoconfigure.ClientAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.util.Assert;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.response.file.CreateFileResponse;
 import xyz.xuminghai.pojo.response.file.UploadFolderResponse;
@@ -41,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @author xuMingHai
  */
 @SpringBootTest
-@ContextConfiguration(classes = {CacheAutoConfiguration.class, ClientAutoConfiguration.class})
+@ComponentScan(basePackages = "xyz.xuminghai.autoconfigure", basePackageClasses = RedisCache.class)
 @Slf4j
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BlockClientTest {
@@ -61,7 +60,8 @@ public class BlockClientTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println(blockClientTemplate.list());
+        Assert.notEmpty(blockClientTemplate.list().getItems(), "查询到的结果集合为空");
+        Assert.notEmpty(blockClientTemplate.list().getItems(), "查询到的结果集合为空");
     }
 
     /**
@@ -69,7 +69,7 @@ public class BlockClientTest {
      */
     @Test
     @Order(1)
-    void test() {
+    void testErrotList() {
         System.out.println(blockClientTemplate.list("1324"));
     }
 

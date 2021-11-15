@@ -29,7 +29,6 @@ public class NullCache implements Cache {
 
     @Override
     public void put(Object key, Object value) {
-
     }
 
     @Override
@@ -38,17 +37,15 @@ public class NullCache implements Cache {
     }
 
     @Override
-    public Object remove(Object key) {
-        return null;
+    public void remove(Object key) {
     }
 
     @Override
     public void clear() {
-
     }
 
     @Override
-    public int size() {
+    public long size() {
         return 0;
     }
 }

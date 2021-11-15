@@ -16,6 +16,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import xyz.xuminghai.cache.AbstractCacheInstance;
 import xyz.xuminghai.cache.BaseCache;
+import xyz.xuminghai.serializer.KryoSerializer;
+import xyz.xuminghai.serializer.Serializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +58,7 @@ public class CacheProperties {
     private int scheduledFixedDelay = 3600;
 
     /**
-     * 缓存实例，可以自定义缓存实例，实现Cache接口和继承缓存实例类，比如使用Redis作为缓存<br/>
+     * 自定义缓存实例，继承{@link AbstractCacheInstance}，比如使用Redis作为缓存<br/>
      * 默认使用jvm缓存
      */
     private Class<? extends AbstractCacheInstance> cacheInstance = BaseCache.class;

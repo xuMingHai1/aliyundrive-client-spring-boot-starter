@@ -71,8 +71,8 @@ public class LoggingDecorator implements Cache {
     }
 
     @Override
-    public Object remove(Object key) {
-        return cache.remove(key);
+    public void remove(Object key) {
+        cache.remove(key);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class LoggingDecorator implements Cache {
     }
 
     @Override
-    public int size() {
+    public long size() {
         return cache.size();
     }
 

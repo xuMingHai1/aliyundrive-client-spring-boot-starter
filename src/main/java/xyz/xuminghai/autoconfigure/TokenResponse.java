@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-package xyz.xuminghai.pojo.response;
+package xyz.xuminghai.autoconfigure;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
