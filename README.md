@@ -13,6 +13,10 @@ QQ交流群：776339385
 
 #### 安装教程
 
+Github地址：https://github.com/xuMingHai1/aliyundrive-client-spring-boot-starter
+
+Gitee地址：https://gitee.com/xuminghai123/aliyundrive-client-spring-boot-starter
+
 在pom文件中引入这个依赖。
 
 只需要这一个依赖就可以是springboot项目，因为其内部引入了springboot-webflux
