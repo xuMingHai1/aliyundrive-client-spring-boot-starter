@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.api.FileEnum;
+import xyz.xuminghai.core.AbstractReactiveDao;
 import xyz.xuminghai.core.ReactiveFileDao;
 import xyz.xuminghai.io.DownloadResource;
 import xyz.xuminghai.pojo.entity.upload.UploadStatus;
@@ -48,9 +49,7 @@ import java.util.Optional;
  * @author xuMingHai
  */
 @Slf4j
-public class ReactiveFileDaoImpl implements ReactiveFileDao {
-
-    private final WebClient webClient;
+public class ReactiveFileDaoImpl extends AbstractReactiveDao implements ReactiveFileDao {
 
     /**
      * 文件上传重试次数
@@ -64,7 +63,7 @@ public class ReactiveFileDaoImpl implements ReactiveFileDao {
 
 
     public ReactiveFileDaoImpl(WebClient webClient, int uploadRetries, int uploadFragmentation) {
-        this.webClient = webClient;
+        super(webClient);
         this.uploadRetries = uploadRetries;
         this.uploadFragmentation = (long) uploadFragmentation << 20;
     }
@@ -72,35 +71,27 @@ public class ReactiveFileDaoImpl implements ReactiveFileDao {
     @Override
     public WebClient.ResponseSpec list(ListRequest listRequest) {
         final FileEnum list = FileEnum.LIST;
-        return webClient.method(list.getHttpMethod()).uri(list.getApi())
-                .bodyValue(listRequest)
-                .retrieve();
+        return sendRequest(list.getHttpMethod(), list.getApi(), listRequest);
     }
 
     @Override
     public WebClient.ResponseSpec search(SearchRequest searchRequest) {
         final FileEnum search = FileEnum.SEARCH;
-        return webClient.method(search.getHttpMethod()).uri(search.getApi())
-                .bodyValue(searchRequest)
-                .retrieve();
+        return sendRequest(search.getHttpMethod(), search.getApi(), searchRequest);
     }
 
     @Override
     public WebClient.ResponseSpec get(String fileId) {
         final FileIdRequest fileIdRequest = new FileIdRequest(fileId);
         final FileEnum get = FileEnum.GET;
-        return webClient.method(get.getHttpMethod()).uri(get.getApi())
-                .bodyValue(fileIdRequest)
-                .retrieve();
+        return sendRequest(get.getHttpMethod(), get.getApi(), fileIdRequest);
     }
 
     @Override
     public WebClient.ResponseSpec getDownloadUrl(String fileId) {
         final FileIdRequest fileIdRequest = new FileIdRequest(fileId);
         final FileEnum getDownloadUrl = FileEnum.GET_DOWNLOAD_URL;
-        return webClient.method(getDownloadUrl.getHttpMethod()).uri(getDownloadUrl.getApi())
-                .bodyValue(fileIdRequest)
-                .retrieve();
+        return sendRequest(getDownloadUrl.getHttpMethod(), getDownloadUrl.getApi(), fileIdRequest);
     }
 
     @Override
@@ -133,11 +124,10 @@ public class ReactiveFileDaoImpl implements ReactiveFileDao {
     @Override
     public WebClient.ResponseSpec createFolder(CreateFolderRequest createFolderRequest) {
         final FileEnum createWithFolders = FileEnum.CREATE_WITH_FOLDERS;
-        return webClient.method(createWithFolders.getHttpMethod()).uri(createWithFolders.getApi())
-                .bodyValue(createFolderRequest)
-                .retrieve();
+        return sendRequest(createWithFolders.getHttpMethod(), createWithFolders.getApi(), createFolderRequest);
     }
 
+    @SuppressWarnings("AlibabaMethodTooLong")
     @Override
     public Mono<CreateFileResponse> uploadFile(String parentFileId, Path path, CheckNameEnum checkNameEnum) {
         if (!Files.isRegularFile(path)) {
@@ -316,9 +306,13 @@ public class ReactiveFileDaoImpl implements ReactiveFileDao {
     @Override
     public WebClient.ResponseSpec update(UpdateRequest updateRequest) {
         final FileEnum update = FileEnum.UPDATE;
-        return webClient.method(update.getHttpMethod()).uri(update.getApi())
-                .bodyValue(updateRequest)
-                .retrieve();
+        return sendRequest(update.getHttpMethod(), update.getApi(), updateRequest);
+    }
+
+    @Override
+    public WebClient.ResponseSpec getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
+        final FileEnum getVideoPreviewPlayInfo = FileEnum.GET_VIDEO_PREVIEW_PLAY_INFO;
+        return sendRequest(getVideoPreviewPlayInfo.getHttpMethod(), getVideoPreviewPlayInfo.getApi(), videoPreviewPlayInfoRequest);
     }
 
 }

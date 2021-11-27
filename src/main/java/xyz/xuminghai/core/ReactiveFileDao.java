@@ -29,7 +29,7 @@ import java.nio.file.Path;
  *
  * @author xuMingHai
  */
-public interface ReactiveFileDao {
+public interface ReactiveFileDao extends ReactiveDao{
 
     /**
      * 自定义请求参数的文件列表获取
@@ -116,6 +116,13 @@ public interface ReactiveFileDao {
      * @return 响应后续操作
      */
     WebClient.ResponseSpec update(UpdateRequest updateRequest);
+
+    /**
+     * 获取播放视频的预览信息
+     * @param videoPreviewPlayInfoRequest 请求体
+     * @return 响应后的操作
+     */
+    WebClient.ResponseSpec getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest);
 
 }
 

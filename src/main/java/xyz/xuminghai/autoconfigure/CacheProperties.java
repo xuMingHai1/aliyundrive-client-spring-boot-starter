@@ -16,6 +16,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import xyz.xuminghai.cache.AbstractCacheInstance;
 import xyz.xuminghai.cache.BaseCache;
+import xyz.xuminghai.cache.decorator.CacheDecoratorEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,23 +36,23 @@ public class CacheProperties {
      */
     private boolean enableCache = true;
 
-
     /**
      * 增强缓存功能的装饰，默认开启：logging，lru，scheduled
      */
-    private List<CacheEnum> decorator = new ArrayList<CacheEnum>(3) {{
-        add(CacheEnum.LOGGING);
-        add(CacheEnum.LRU);
-        add(CacheEnum.SCHEDULED);
+    private List<CacheDecoratorEnum> decorator = new ArrayList<CacheDecoratorEnum>(3) {{
+        add(CacheDecoratorEnum.LOGGING);
+        add(CacheDecoratorEnum.LRU);
+        add(CacheDecoratorEnum.SCHEDULED);
     }};
 
     /**
-     * lru装饰最大访问量，默认1024
+     * lru装饰缓存元素的最大容量，到达这个容量上限时，删除访问量最少的缓存，
+     * 默认1024
      */
     private int lruMaxCapacity = 1024;
 
     /**
-     * scheduled装饰的固定延迟，默认3600，单位：秒
+     * scheduled装饰的固定延迟后清空缓存，默认3600，单位：秒
      */
     private int scheduledFixedDelay = 3600;
 

@@ -15,16 +15,15 @@ package xyz.xuminghai.executor;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -110,11 +109,35 @@ public interface ReactiveExecutor extends Executor {
     Mono<ResponseEntity<BaseItem>> update(UpdateRequest updateRequest);
 
     /**
-     * 将文件移入到回收站
+     * 将文件或文件夹移入回收站
      *
      * @param fileId 文件ID
      * @return 没有http实体的异步响应
      */
     @Override
     Mono<ResponseEntity<Void>> trash(String fileId);
+
+    /**
+     * 获取视频播放的预览信息
+     * @param videoPreviewPlayInfoRequest 请求体
+     * @return 返回的响应
+     */
+    @Override
+    Mono<ResponseEntity<VideoPreviewPlayInfoResponse>> getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest);
+
+    /**
+     * 处理视频网址
+     * @param url 视频地址
+     * @return 响应的结果
+     */
+    Mono<ResponseEntity<Resource>> parseVideoUrl(URL url);
+
+    /**
+     * 使用get方式获取url的资源
+     * @param url 资源地址
+     * @param mediaType 返回的媒体类型
+     * @return 响应的结果
+     */
+    Mono<ResponseEntity<Resource>> getResource(URL url, MediaType mediaType);
+
 }

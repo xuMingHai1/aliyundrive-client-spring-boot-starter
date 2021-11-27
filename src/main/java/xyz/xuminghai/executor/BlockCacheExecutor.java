@@ -12,14 +12,10 @@
 
 package xyz.xuminghai.executor;
 
-import org.springframework.util.ObjectUtils;
 import xyz.xuminghai.cache.Cache;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
 import java.nio.file.OpenOption;
@@ -31,28 +27,23 @@ import java.nio.file.Path;
  *
  * @author xuMingHai
  */
-public class BlockCacheExecutor implements BlockExecutor {
-
-    private final Cache cache;
+public class BlockCacheExecutor extends AbstractCacheExecutor implements BlockExecutor {
 
     private final BlockExecutor blockExecutor;
 
     public BlockCacheExecutor(Cache cache, BlockExecutor blockExecutor) {
-        this.cache = cache;
+        super(cache);
         this.blockExecutor = blockExecutor;
     }
 
     @Override
     public ListResponse list(ListRequest listRequest) {
         final String key = "block_list_" + listRequest.hashCode();
-        final Object o = cache.get(key);
-        ListResponse listResponse;
+        ListResponse listResponse = (ListResponse) cache.get(key);
 
-        if (ObjectUtils.isEmpty(o)) {
+        if (listResponse == null) {
             listResponse = blockExecutor.list(listRequest);
             cache.put(key, listResponse);
-        } else {
-            listResponse = (ListResponse) o;
         }
 
         return listResponse;
@@ -61,14 +52,11 @@ public class BlockCacheExecutor implements BlockExecutor {
     @Override
     public SearchResponse search(SearchRequest searchRequest) {
         final String key = "block_search_" + searchRequest.hashCode();
-        final Object o = cache.get(key);
-        SearchResponse searchResponse;
+        SearchResponse searchResponse = (SearchResponse) cache.get(key);
 
-        if (ObjectUtils.isEmpty(o)) {
+        if (searchResponse == null) {
             searchResponse = blockExecutor.search(searchRequest);
             cache.put(key, searchResponse);
-        } else {
-            searchResponse = (SearchResponse) o;
         }
 
         return searchResponse;
@@ -77,14 +65,11 @@ public class BlockCacheExecutor implements BlockExecutor {
     @Override
     public BaseItem get(String fileId) {
         final String key = "block_get_" + fileId;
-        final Object o = cache.get(key);
-        BaseItem baseItem;
+        BaseItem baseItem = (BaseItem) cache.get(key);
 
-        if (ObjectUtils.isEmpty(o)) {
+        if (baseItem == null) {
             baseItem = blockExecutor.get(fileId);
             cache.put(key, baseItem);
-        } else {
-            baseItem = (BaseItem) o;
         }
 
         return baseItem;
@@ -128,6 +113,11 @@ public class BlockCacheExecutor implements BlockExecutor {
     public BaseItem update(UpdateRequest updateRequest) {
         cache.clear();
         return blockExecutor.update(updateRequest);
+    }
+
+    @Override
+    public VideoPreviewPlayInfoResponse getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
+        return blockExecutor.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest);
     }
 
 }

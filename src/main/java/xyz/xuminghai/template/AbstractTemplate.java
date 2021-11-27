@@ -18,10 +18,7 @@ import xyz.xuminghai.pojo.enums.CategoryEnum;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
 import xyz.xuminghai.pojo.enums.OrderByEnum;
 import xyz.xuminghai.pojo.enums.OrderDirectionEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 
 import java.nio.file.Path;
 
@@ -31,7 +28,7 @@ import java.nio.file.Path;
  *
  * @author xuMingHai
  */
-public abstract class AbstractTemplate implements Executor {
+abstract class AbstractTemplate implements Executor {
 
     /**
      * 阿里云盘默认的顶级目录
@@ -119,15 +116,6 @@ public abstract class AbstractTemplate implements Executor {
     }
 
     /**
-     * 自定义请求参数的文件列表获取
-     *
-     * @param listRequest 文件请求参数
-     * @return 文件列表响应
-     */
-    @Override
-    public abstract Object list(ListRequest listRequest);
-
-    /**
      * 根据文件名搜索文件<br/>
      * 详细的请求配置请参考：{@link SearchRequest}
      *
@@ -179,33 +167,6 @@ public abstract class AbstractTemplate implements Executor {
         searchRequest.setOrderBy(orderByEnum, orderDirectionEnum);
         return search(searchRequest);
     }
-
-    /**
-     * 使用自定义的请求参数搜索文件
-     *
-     * @param searchRequest 自定义搜索请求参数
-     * @return 搜索响应结果
-     */
-    @Override
-    public abstract Object search(SearchRequest searchRequest);
-
-    /**
-     * 获取单个文件或文件夹的信息
-     *
-     * @param fileId 文件ID
-     * @return 文件信息（可以根据类型转为对应的子类）
-     */
-    @Override
-    public abstract Object get(String fileId);
-
-    /**
-     * 获取这个文件的下载参数
-     *
-     * @param fileId 文件ID
-     * @return 这个文件的下载参数
-     */
-    @Override
-    public abstract Object getDownloadUrl(String fileId);
 
     /**
      * 创建文件夹，使用默认的同名策略，自动重命名，使用默认的顶级目录<br/>
@@ -260,15 +221,6 @@ public abstract class AbstractTemplate implements Executor {
     }
 
     /**
-     * 创建文件夹
-     *
-     * @param createFolderRequest 创建文件夹请求
-     * @return 响应信息
-     */
-    @Override
-    public abstract Object createFolder(CreateFolderRequest createFolderRequest);
-
-    /**
      * 上传文件，使用默认的顶级目录、同名策略（支持快传和分片上传）
      *
      * @param path 文件路径
@@ -301,18 +253,7 @@ public abstract class AbstractTemplate implements Executor {
     }
 
     /**
-     * 上传文件（支持快传和分片上传）
-     *
-     * @param parentFileId  父目录ID
-     * @param path          文件路径
-     * @param checkNameEnum 同名策略
-     * @return 响应信息
-     */
-    @Override
-    public abstract Object uploadFile(String parentFileId, Path path, CheckNameEnum checkNameEnum);
-
-    /**
-     * 修改文件名
+     * 修改文件名或文件夹名
      *
      * @param fileId      文件ID
      * @param newFileName 新的文件名
@@ -323,21 +264,12 @@ public abstract class AbstractTemplate implements Executor {
     }
 
     /**
-     * 修改文件名
-     *
-     * @param updateRequest 修改文件名请求参数
-     * @return 响应信息
-     */
-    @Override
-    public abstract Object update(UpdateRequest updateRequest);
-
-    /**
-     * 将文件移入回收站
-     *
+     * 获取视频播放的预览信息
      * @param fileId 文件ID
      * @return 响应信息
      */
-    @Override
-    public abstract Object trash(String fileId);
+    public Object getVideoPreviewPlayInfo(String fileId) {
+        return getVideoPreviewPlayInfo(new VideoPreviewPlayInfoRequest(fileId));
+    }
 
 }

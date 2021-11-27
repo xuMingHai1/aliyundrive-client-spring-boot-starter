@@ -12,6 +12,7 @@
 
 package xyz.xuminghai.test;
 
+import lombok.extern.slf4j.Slf4j;
 import xyz.xuminghai.pojo.response.file.UploadFolderResponse;
 
 import java.io.ByteArrayInputStream;
@@ -29,6 +30,7 @@ import java.util.Arrays;
  *
  * @author xuMingHai
  */
+@Slf4j
 public class OtherTest {
 
     /**
@@ -91,6 +93,5 @@ public class OtherTest {
 
         System.out.println(uploadFolderResponse);
     }
-
 
 }

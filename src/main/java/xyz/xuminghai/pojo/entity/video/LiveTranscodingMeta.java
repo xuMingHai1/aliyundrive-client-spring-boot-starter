@@ -10,35 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
-package xyz.xuminghai.autoconfigure;
+package xyz.xuminghai.pojo.entity.video;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.Data;
 
 /**
- * 2021/10/24 8:09 星期日<br/>
- * 缓存的装饰器
- *
+ * 2021/11/27 0:22 星期六<br/>
+ * 实时转码元
  * @author xuMingHai
  */
-public enum CacheEnum {
+@Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class LiveTranscodingMeta {
 
     /**
-     * 日志装饰，用于输出缓存的命中率
+     * ts文件段
      */
-    LOGGING,
+    private int tsSegment;
 
     /**
-     * lru算法，在指定的访问容量到达上限时，优先删除访问量少的缓存
+     * ts文件总数
      */
-    LRU,
+    private int tsTotalCount;
 
     /**
-     * 给定固定延迟，定时删除缓存
+     * ts文件预计数
      */
-    SCHEDULED,
-
-    /**
-     * 不添加任何装饰器，如果这个存在则不会给缓存实例添加任何装饰器
-     */
-    NONE
-
-
+    private int tsPreCount;
 }

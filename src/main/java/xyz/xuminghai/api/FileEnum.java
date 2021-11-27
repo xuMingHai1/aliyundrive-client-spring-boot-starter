@@ -65,7 +65,17 @@ public enum FileEnum {
     /**
      * 上传文件后，完全性检查
      */
-    COMPLETE(getUri("https://api.aliyundrive.com/v2/file/complete"), HttpMethod.POST);
+    COMPLETE(getUri("https://api.aliyundrive.com/v2/file/complete"), HttpMethod.POST),
+
+    /**
+     * 获取视频预览播放信息
+     */
+    GET_VIDEO_PREVIEW_PLAY_INFO(getUri("https://api.aliyundrive.com/v2/file/get_video_preview_play_info"), HttpMethod.POST),
+
+    /**
+     * 获取音频播放信息
+     */
+    GET_AUDIO_PLAY_INFO(getUri("https://api.aliyundrive.com/v2/databox/get_audio_play_info"), HttpMethod.POST);
 
 
     /**

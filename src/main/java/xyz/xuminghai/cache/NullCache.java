@@ -12,6 +12,8 @@
 
 package xyz.xuminghai.cache;
 
+import java.util.Set;
+
 /**
  * 2021/10/26 22:53 星期二<br/>
  * 一个空对象缓存，表示没有启用缓存
@@ -47,5 +49,10 @@ public class NullCache implements Cache {
     @Override
     public long size() {
         return 0;
+    }
+
+    @Override
+    public Set<Object> keySet() {
+        return null;
     }
 }

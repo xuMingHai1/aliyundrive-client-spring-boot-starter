@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import xyz.xuminghai.cache.BaseCache;
 import xyz.xuminghai.cache.Cache;
 import xyz.xuminghai.cache.NullCache;
+import xyz.xuminghai.cache.decorator.CacheDecoratorEnum;
 import xyz.xuminghai.cache.decorator.LoggingDecorator;
 import xyz.xuminghai.cache.decorator.LruDecorator;
 import xyz.xuminghai.cache.decorator.ScheduledDecorator;
@@ -63,27 +64,26 @@ public class CacheAutoConfiguration {
         }
         Cache cache = beanFactory.getBean(cacheProperties.getCacheInstance());
         // 增强缓存的装饰器
-        final List<CacheEnum> decoratorList = cacheProperties.getDecorator();
+        final List<CacheDecoratorEnum> decoratorList = cacheProperties.getDecorator();
         // 如果存在none，不添加任何装饰器
-        if (decoratorList.contains(CacheEnum.NONE)) {
+        if (decoratorList.contains(CacheDecoratorEnum.NONE)) {
             return cache;
         }
         // 给缓存实例添加装饰器
-        for (CacheEnum cacheEnum : decoratorList) {
-            // 日志装饰器
-            if (cacheEnum == CacheEnum.LOGGING) {
-                cache = new LoggingDecorator(cache);
-            }
 
-            // lru装饰器
-            if (cacheEnum == CacheEnum.LRU) {
-                cache = new LruDecorator(cache, cacheProperties.getLruMaxCapacity());
-            }
+        // 日志装饰器
+        if (decoratorList.contains(CacheDecoratorEnum.LOGGING)) {
+            cache = new LoggingDecorator(cache);
+        }
 
-            // scheduled装饰器
-            if (cacheEnum == CacheEnum.SCHEDULED) {
-                cache = new ScheduledDecorator(cache, cacheProperties.getScheduledFixedDelay());
-            }
+        // lru装饰器
+        if (decoratorList.contains(CacheDecoratorEnum.LRU)) {
+            cache = new LruDecorator(cache, cacheProperties.getLruMaxCapacity());
+        }
+
+        // scheduled装饰器
+        if (decoratorList.contains(CacheDecoratorEnum.SCHEDULED)) {
+            cache = new ScheduledDecorator(cache, cacheProperties.getScheduledFixedDelay());
         }
         return cache;
     }

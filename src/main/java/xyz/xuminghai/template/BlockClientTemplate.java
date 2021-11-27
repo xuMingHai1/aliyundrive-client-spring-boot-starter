@@ -24,10 +24,7 @@ import xyz.xuminghai.pojo.enums.CategoryEnum;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
 import xyz.xuminghai.pojo.enums.OrderByEnum;
 import xyz.xuminghai.pojo.enums.OrderDirectionEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
 import java.nio.file.OpenOption;
@@ -386,7 +383,7 @@ public class BlockClientTemplate extends AbstractTemplate {
     }
 
     /**
-     * 修改文件名
+     * 修改文件名或文件夹名
      *
      * @param fileId      文件ID
      * @param newFileName 新的文件名
@@ -398,7 +395,7 @@ public class BlockClientTemplate extends AbstractTemplate {
     }
 
     /**
-     * 修改文件名
+     * 修改文件名或文件夹名
      *
      * @param updateRequest 修改文件名请求参数
      * @return 响应信息
@@ -409,7 +406,7 @@ public class BlockClientTemplate extends AbstractTemplate {
     }
 
     /**
-     * 将文件移入回收站
+     * 将文件或文件夹移入回收站
      *
      * @param fileId 文件ID
      * @return 响应信息
@@ -417,5 +414,27 @@ public class BlockClientTemplate extends AbstractTemplate {
     @Override
     public Boolean trash(String fileId) {
         return blockExecutor.trash(fileId);
+    }
+
+    /**
+     * 获取视频播放的预览信息
+     *
+     * @param videoPreviewPlayInfoRequest 请求体
+     * @return 返回的响应
+     */
+    @Override
+    public VideoPreviewPlayInfoResponse getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
+        return blockExecutor.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest);
+    }
+
+    /**
+     * 获取视频播放的预览信息
+     *
+     * @param fileId 文件ID
+     * @return 响应信息
+     */
+    @Override
+    public VideoPreviewPlayInfoResponse getVideoPreviewPlayInfo(String fileId) {
+        return (VideoPreviewPlayInfoResponse) super.getVideoPreviewPlayInfo(fileId);
     }
 }

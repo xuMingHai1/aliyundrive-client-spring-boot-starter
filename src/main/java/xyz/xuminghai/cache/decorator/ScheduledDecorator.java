@@ -15,12 +15,13 @@ package xyz.xuminghai.cache.decorator;
 import lombok.extern.slf4j.Slf4j;
 import xyz.xuminghai.cache.Cache;
 
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
  * 2021/10/21 18:33 星期四<br/>
- * 给定多少秒，定时清除缓存
+ * 给定多少秒，定时清空缓存
  *
  * @author xuMingHai
  */
@@ -36,7 +37,7 @@ public class ScheduledDecorator implements Cache {
     public ScheduledDecorator(Cache cache, int fixedDelay) {
         this.cache = cache;
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
-            log.info("【定时清除缓存】_{}：执行了清除缓存", getName());
+            log.info("【{}】定时{}秒：执行了定时清空缓存", getName(), fixedDelay);
             clear();
         }, fixedDelay, fixedDelay, TimeUnit.SECONDS);
     }
@@ -70,4 +71,10 @@ public class ScheduledDecorator implements Cache {
     public long size() {
         return cache.size();
     }
+
+    @Override
+    public Set<Object> keySet() {
+        return cache.keySet();
+    }
+
 }

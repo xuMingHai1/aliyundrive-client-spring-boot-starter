@@ -21,6 +21,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ClientCodecConfigurer;
@@ -163,7 +164,12 @@ public class ClientAutoConfiguration {
             final Field defaultRequest = this.webClient.getClass().getDeclaredField("defaultRequest");
             defaultRequest.setAccessible(true);
             Consumer<WebClient.RequestHeadersSpec<?>> consumer = requestHeadersSpec -> requestHeadersSpec.accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM)
-                    .headers(httpHeaders -> httpHeaders.setBearerAuth(TokenStatic.ACCESS_TOKEN));
+                    .headers(httpHeaders -> {
+                        httpHeaders.setBearerAuth(TokenStatic.ACCESS_TOKEN);
+                        httpHeaders.set(HttpHeaders.REFERER, "https://www.aliyundrive.com/");
+                        httpHeaders.setOrigin("https://www.aliyundrive.com");
+                        httpHeaders.set(HttpHeaders.USER_AGENT, "aliyundrive-client-spring-boot-starter");
+                    });
             defaultRequest.set(this.webClient, consumer);
             defaultRequest.setAccessible(false);
         } catch (NoSuchFieldException | IllegalAccessException e) {

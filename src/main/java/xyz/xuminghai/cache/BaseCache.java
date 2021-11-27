@@ -14,6 +14,8 @@ package xyz.xuminghai.cache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * 2021/10/21 12:39 星期四<br/>
@@ -48,5 +50,10 @@ public class BaseCache extends AbstractCacheInstance {
     @Override
     public long size() {
         return cache.size();
+    }
+
+    @Override
+    protected Supplier<Set<Object>> getKeySet() {
+        return cache::keySet;
     }
 }

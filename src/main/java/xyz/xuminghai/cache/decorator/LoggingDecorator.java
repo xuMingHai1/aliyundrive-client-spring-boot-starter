@@ -16,10 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import xyz.xuminghai.cache.Cache;
 
 import java.text.DecimalFormat;
+import java.util.Set;
 
 /**
  * 2021/10/21 15:48 星期四<br/>
- * 日志装饰，用于记录缓存命中率
+ * 日志装饰，用于记录缓存命中率，这个命中率并不是十分准确<br/>
+ * 在多个线程同时的情况下，会存在问题。不过这个只是命中率，不需要多高的准确性，但是是否命中缓存确实准确的
  *
  * @author xuMingHai
  */
@@ -39,7 +41,7 @@ public class LoggingDecorator implements Cache {
      */
     private int count;
     /**
-     * 命中
+     * 命中次数
      */
     private int hits;
 
@@ -59,14 +61,17 @@ public class LoggingDecorator implements Cache {
 
     @Override
     public Object get(Object key) {
+        // 缓存是否命中
+        boolean hit = false;
         // 调用次数累计
         count++;
         final Object value = cache.get(key);
         // 如果从缓存中找到，命中次数加1
         if (value != null) {
             hits++;
+            hit = true;
         }
-        log.info("【{}】缓存命中率：{}", getName(), getHitRatio());
+        log.info("【{}】缓存命中率：{}\t这个请求是否命中缓存：{}", getName(), getHitRatio(), hit);
         return value;
     }
 
@@ -86,6 +91,11 @@ public class LoggingDecorator implements Cache {
     @Override
     public long size() {
         return cache.size();
+    }
+
+    @Override
+    public Set<Object> keySet() {
+        return cache.keySet();
     }
 
     /**

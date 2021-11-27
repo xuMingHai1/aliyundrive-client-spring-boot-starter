@@ -10,25 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
-package xyz.xuminghai.core;
-
-import org.springframework.web.reactive.function.client.WebClient;
+package xyz.xuminghai.cache.decorator;
 
 /**
- * 2021/10/26 23:40 星期二<br/>
- * 反应式回收站接口
+ * 2021/10/24 8:09 星期日<br/>
+ * 缓存的装饰器
  *
  * @author xuMingHai
  */
-public interface ReactiveRecycleDao extends ReactiveDao{
+public enum CacheDecoratorEnum {
 
     /**
-     * 将文件或文件夹移入回收站
-     *
-     * @param fileId 文件ID
-     * @return 后续响应操作
+     * 日志装饰，用于输出缓存的命中率
      */
-    WebClient.ResponseSpec trash(String fileId);
+    LOGGING,
+
+    /**
+     * lru算法，在指定的访问容量到达上限时，优先删除访问量少的缓存
+     */
+    LRU,
+
+    /**
+     * 给定固定延迟，定时删除缓存
+     */
+    SCHEDULED,
+
+    /**
+     * 不添加任何装饰器，如果这个存在则不会给缓存实例添加任何装饰器
+     */
+    NONE
 
 
 }

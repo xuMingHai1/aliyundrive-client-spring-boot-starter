@@ -12,6 +12,8 @@
 
 package xyz.xuminghai.cache;
 
+import java.util.Set;
+
 /**
  * 2021/10/21 11:00 星期四<br/>
  * 缓存接口，定义缓存功能<br/>
@@ -61,6 +63,12 @@ public interface Cache {
      * @return 缓存元素的个数
      */
     long size();
+
+    /**
+     * 获取这个缓存实例中所有的key，只读的set集合
+     * @return key的set集合，如果没有key则是空的set集合
+     */
+    Set<Object> keySet();
 
 
 }

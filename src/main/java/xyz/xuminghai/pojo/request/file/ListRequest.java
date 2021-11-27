@@ -92,4 +92,9 @@ public class ListRequest {
     public void setOrderDirection(OrderDirectionEnum orderDirection) {
         this.orderDirection = orderDirection.getValue();
     }
+
+    public ListRequest() {
+    }
+
+
 }

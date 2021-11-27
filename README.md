@@ -26,7 +26,7 @@ Gitee地址：https://gitee.com/xuminghai123/aliyundrive-client-spring-boot-star
 <dependency>
     <groupId>xyz.xuminghai</groupId>
     <artifactId>aliyundrive-client-spring-boot-starter</artifactId>
-    <version>0.0.5-alpha</version>
+    <version>0.0.6-alpha</version>
 </dependency>
 ```
 

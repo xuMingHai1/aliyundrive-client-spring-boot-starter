@@ -14,10 +14,7 @@ package xyz.xuminghai.executor;
 
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
 import java.io.IOException;
@@ -214,11 +211,19 @@ public interface BlockExecutor extends Executor {
     BaseItem update(UpdateRequest updateRequest);
 
     /**
-     * 将文件移入到回收站
+     * 将文件或文件夹移入回收站
      *
      * @param fileId 文件ID
      * @return 返回的响应
      */
     @Override
     Boolean trash(String fileId);
+
+    /**
+     * 获取视频播放的预览信息
+     * @param videoPreviewPlayInfoRequest 请求体
+     * @return 返回的响应
+     */
+    @Override
+    VideoPreviewPlayInfoResponse getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest);
 }

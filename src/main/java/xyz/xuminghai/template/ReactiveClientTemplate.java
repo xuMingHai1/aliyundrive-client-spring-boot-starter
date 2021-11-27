@@ -14,26 +14,28 @@ package xyz.xuminghai.template;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.cache.Cache;
 import xyz.xuminghai.cache.NullCache;
 import xyz.xuminghai.core.ReactiveFileDao;
 import xyz.xuminghai.core.ReactiveRecycleDao;
+import xyz.xuminghai.exception.InvalidBaseItemException;
 import xyz.xuminghai.executor.ReactiveBaseExecutor;
 import xyz.xuminghai.executor.ReactiveCacheExecutor;
 import xyz.xuminghai.executor.ReactiveExecutor;
 import xyz.xuminghai.pojo.entity.BaseItem;
+import xyz.xuminghai.pojo.entity.ImageItem;
+import xyz.xuminghai.pojo.entity.video.LiveTranscodingTask;
 import xyz.xuminghai.pojo.enums.CategoryEnum;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
 import xyz.xuminghai.pojo.enums.OrderByEnum;
 import xyz.xuminghai.pojo.enums.OrderDirectionEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -344,7 +346,7 @@ public class ReactiveClientTemplate extends AbstractTemplate {
     }
 
     /**
-     * 修改文件名
+     * 修改文件名或文件夹名
      *
      * @param fileId      文件ID
      * @param newFileName 新的文件名
@@ -356,7 +358,7 @@ public class ReactiveClientTemplate extends AbstractTemplate {
     }
 
     /**
-     * 修改文件名
+     * 修改文件名或文件夹名
      *
      * @param updateRequest 修改文件名请求参数
      * @return 响应信息
@@ -367,7 +369,7 @@ public class ReactiveClientTemplate extends AbstractTemplate {
     }
 
     /**
-     * 将文件移入回收站
+     * 将文件或文件夹移入回收站
      *
      * @param fileId 文件ID
      * @return 响应信息
@@ -375,5 +377,72 @@ public class ReactiveClientTemplate extends AbstractTemplate {
     @Override
     public Mono<ResponseEntity<Void>> trash(String fileId) {
         return reactiveExecutor.trash(fileId);
+    }
+
+    /**
+     * 获取视频播放的预览信息
+     *
+     * @param videoPreviewPlayInfoRequest 请求体
+     * @return 返回的响应
+     */
+    @Override
+    public Mono<ResponseEntity<VideoPreviewPlayInfoResponse>> getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
+        return reactiveExecutor.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest);
+    }
+
+    /**
+     * 获取视频播放的预览信息
+     *
+     * @param fileId 文件ID
+     * @return 响应信息
+     */
+    @Override
+    public Mono<ResponseEntity<VideoPreviewPlayInfoResponse>> getVideoPreviewPlayInfo(String fileId) {
+        return (Mono<ResponseEntity<VideoPreviewPlayInfoResponse>>) super.getVideoPreviewPlayInfo(fileId);
+    }
+
+    /**
+     * 将原始的m3u8文件的ts文件相对地址改为绝对地址
+     * <pre>
+     *  480p 576p 被称为度SD(Standard Definition)（标清）
+     *
+     *  720p 被称为HD(High Definition)（高清）
+     *
+     *  1080p 被称为FHD(Full High Definition)（全高清）
+     *
+     *  4k 被称为UHD(Ultra High Definition)(超高答清)(或 4k UHD)
+     *
+     *  8k 被称为FUHD(Full Ultra High Definition)(8k超高清)(或 8k UHD)
+     *  </pre>
+     * @param url {@link LiveTranscodingTask#getUrl()}
+     * @return 处理后的m3u8文件
+     */
+    public Mono<ResponseEntity<Resource>> palyVideo(URL url) {
+       return reactiveExecutor.parseVideoUrl(url);
+    }
+
+    /**
+     * 获取图片资源
+     * @param fileId 文件ID
+     * @param thumbnail true使用缩略图的url，false使用原始图（ImageItem中的thumbnail缩略图）
+     * @return 图片资源
+     */
+    public Mono<ResponseEntity<Resource>> getImage(String fileId, boolean thumbnail) {
+        return get(fileId).flatMap(baseItemResponseEntity -> {
+            URL url = null;
+            MediaType mediaType = null;
+            try {
+                final ImageItem imageItem = ImageItem.valueOf(baseItemResponseEntity.getBody());
+                if (thumbnail) {
+                    url = imageItem.getThumbnail();
+                } else {
+                    url = imageItem.getUrl();
+                }
+               mediaType = MediaType.parseMediaType(imageItem.getMimeType());
+            } catch (InvalidBaseItemException e) {
+                e.printStackTrace();
+            }
+            return reactiveExecutor.getResource(url, mediaType);
+        });
     }
 }

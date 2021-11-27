@@ -13,15 +13,21 @@
 package xyz.xuminghai.test;
 
 import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 import xyz.xuminghai.cache.AbstractCacheInstance;
 import xyz.xuminghai.serializer.Serializer;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * 2021/11/12 2:51 星期五<br/>
@@ -34,6 +40,7 @@ public class RedisCache extends AbstractCacheInstance {
     private final RedisTemplate<Object, Object> redisTemplate;
 
     public RedisCache(RedisTemplate<Object, Object> redisTemplate, Serializer serializer) {
+        // 设置value的序列化器
         redisTemplate.setValueSerializer(new RedisSerializer<Object>() {
             @Override
             public byte[] serialize(Object o) throws SerializationException {
@@ -45,8 +52,15 @@ public class RedisCache extends AbstractCacheInstance {
                 return serializer.deserialize(bytes);
             }
         });
+        // 设置key的序列化器
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        // 使用池化的Lettuce连接工厂
+        final LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactory(new RedisStandaloneConfiguration(), LettucePoolingClientConfiguration.defaultConfiguration());
+        lettuceConnectionFactory.afterPropertiesSet();
+        redisTemplate.setConnectionFactory(lettuceConnectionFactory);
         this.redisTemplate = redisTemplate;
     }
+
 
     /**
      * 添加缓存内容
@@ -98,5 +112,10 @@ public class RedisCache extends AbstractCacheInstance {
     @Override
     public long size() {
         return Optional.ofNullable(redisTemplate.execute(RedisConnection::dbSize)).orElse(0L);
+    }
+
+    @Override
+    protected Supplier<Set<Object>> getKeySet() {
+        return () -> redisTemplate.keys("*");
     }
 }

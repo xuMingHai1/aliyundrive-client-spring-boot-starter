@@ -17,10 +17,7 @@ import xyz.xuminghai.core.ReactiveFileDao;
 import xyz.xuminghai.core.ReactiveRecycleDao;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
 import java.io.IOException;
@@ -38,15 +35,10 @@ import java.nio.file.Path;
  *
  * @author xuMingHai
  */
-public class BlockBaseExecutor implements BlockExecutor {
-
-    private final ReactiveFileDao reactiveFileDao;
-
-    private final ReactiveRecycleDao reactiveRecycleDao;
+public class BlockBaseExecutor extends AbstractExecutor implements BlockExecutor {
 
     public BlockBaseExecutor(ReactiveFileDao reactiveFileDao, ReactiveRecycleDao reactiveRecycleDao) {
-        this.reactiveFileDao = reactiveFileDao;
-        this.reactiveRecycleDao = reactiveRecycleDao;
+        super(reactiveFileDao, reactiveRecycleDao);
     }
 
     @Override
@@ -130,4 +122,10 @@ public class BlockBaseExecutor implements BlockExecutor {
                 .block();
     }
 
+    @Override
+    public VideoPreviewPlayInfoResponse getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
+        return reactiveFileDao.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest)
+                .bodyToMono(VideoPreviewPlayInfoResponse.class)
+                .block();
+    }
 }

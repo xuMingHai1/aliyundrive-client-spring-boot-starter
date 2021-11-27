@@ -34,6 +34,8 @@ public class KryoSerializer implements Serializer{
 
     private static Class<?> HeadersUtils$1Class;
 
+    private static final int MAX_CAPACITY = Runtime.getRuntime().availableProcessors() * 2;
+
     static {
         try {
             ReadOnlyHttpHeadersClass = Class.forName("org.springframework.http.ReadOnlyHttpHeaders");
@@ -43,7 +45,7 @@ public class KryoSerializer implements Serializer{
         }
     }
 
-    private static final Pool<Kryo> KRYO_POOL = new Pool<Kryo>(true, false, 16) {
+    private static final Pool<Kryo> KRYO_POOL = new Pool<Kryo>(true, false, MAX_CAPACITY) {
 
         @Override
         protected Kryo create() {
@@ -70,14 +72,14 @@ public class KryoSerializer implements Serializer{
         }
     };
 
-    private static final Pool<Input> INPUT_POOL = new Pool<Input>(true, false, 16) {
+    private static final Pool<Input> INPUT_POOL = new Pool<Input>(true, false, MAX_CAPACITY) {
         @Override
         protected Input create() {
             return new Input();
         }
     };
 
-    private static final Pool<Output> OUTPUT_POOL = new Pool<Output>(true, false, 16) {
+    private static final Pool<Output> OUTPUT_POOL = new Pool<Output>(true, false, MAX_CAPACITY) {
 
         @Override
         protected Output create() {

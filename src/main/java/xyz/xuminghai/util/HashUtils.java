@@ -18,10 +18,11 @@ import xyz.xuminghai.exception.UnsupportedSystemException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.AbstractList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -38,11 +39,20 @@ public final class HashUtils {
     /**
      * 受支持的操作系统
      */
-    private static final List<String> LIST = new ArrayList<String>(3) {{
-        add("Windows");
-        add("Linux");
-        add("Mac");
-    }};
+    private static final List<String> LIST = new AbstractList<String>() {
+
+        private final String[] strings = {"Windows", "Linux", "Mac"};
+
+        @Override
+        public int size() {
+            return strings.length;
+        }
+
+        @Override
+        public String get(int index) {
+            return strings[index];
+        }
+    };
 
     /**
      * 当前操作系统的名字
@@ -61,7 +71,7 @@ public final class HashUtils {
     @SuppressWarnings("AlibabaUndefineMagicConstant")
     public static String sha1(Path path) {
         checkFile(Objects.requireNonNull(path, "path 为 null"));
-        log.info("开始计算【{}】的hash", path.getFileName());
+        log.info("开始计算【{}】的sha1", path.getFileName());
         if (SYSTEM_NAME.contains(LIST.get(0))) {
             return windowsSha1(path.toAbsolutePath().toString()).toUpperCase(Locale.ROOT);
         } else if (SYSTEM_NAME.contains(LIST.get(1))) {
@@ -83,7 +93,7 @@ public final class HashUtils {
     @SuppressWarnings("AlibabaUndefineMagicConstant")
     public static String md5(Path path) {
         checkFile(path);
-
+        log.info("开始计算【{}】的md5", path.getFileName());
         if (SYSTEM_NAME.contains(LIST.get(0))) {
             return windowsMd5(path.toAbsolutePath().toString()).toUpperCase(Locale.ROOT);
         } else if (SYSTEM_NAME.contains(LIST.get(1))) {
@@ -116,7 +126,7 @@ public final class HashUtils {
     }
 
     /**
-     * 返回支持的操作系统
+     * 返回不可修改的支持的操作系统集合
      *
      * @return 操作系统名字集合
      */
@@ -126,15 +136,15 @@ public final class HashUtils {
 
     private static String windowsSha1(String path) {
         final ProcessBuilder processBuilder = new ProcessBuilder("CertUtil", "-hashfile", path, "SHA1");
-        return windowsExecute(processBuilder);
+        return windowsExecuteCommand(processBuilder);
     }
 
     private static String windowsMd5(String path) {
         final ProcessBuilder processBuilder = new ProcessBuilder("CertUtil", "-hashfile", path, "MD5");
-        return windowsExecute(processBuilder);
+        return windowsExecuteCommand(processBuilder);
     }
 
-    private static String windowsExecute(ProcessBuilder processBuilder) {
+    private static String windowsExecuteCommand(ProcessBuilder processBuilder) {
         try {
             final Process process = processBuilder.start();
             final InputStream inputStream = process.getInputStream();
@@ -148,12 +158,25 @@ public final class HashUtils {
     }
 
     private static String linuxSha1(String path) {
-        // TODO: 暂无Linux
-        return "";
+        final ProcessBuilder processBuilder = new ProcessBuilder("sha1sum", "-b", path);
+        return linuxExecuteCommand(processBuilder);
     }
 
     private static String linuxMd5(String path) {
-        // TODO: 暂无Linux
+        final ProcessBuilder processBuilder = new ProcessBuilder("md5sum", "-b", path);
+        return linuxExecuteCommand(processBuilder);
+    }
+
+    private static String linuxExecuteCommand(ProcessBuilder processBuilder) {
+        try {
+            final Process process = processBuilder.start();
+            final InputStream inputStream = process.getInputStream();
+            final String string = IoUtils.toString(IoUtils.printlnResetOrPushback(inputStream, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+            inputStream.close();
+            return string.split(" ")[0];
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return "";
     }
 

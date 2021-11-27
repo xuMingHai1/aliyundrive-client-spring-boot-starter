@@ -12,6 +12,10 @@
 
 package xyz.xuminghai.cache;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.function.Supplier;
+
 /**
  * 2021/10/26 21:33 星期二<br/>
  * 抽象的缓存实例模板类，自定义缓存实例需要继承这个模板类
@@ -31,9 +35,21 @@ public abstract class AbstractCacheInstance implements Cache {
      * @return 缓存名
      */
     @Override
-    public String getName() {
+    public final String getName() {
         return this.name;
     }
 
+    /**
+     * 提供缓存实例keySet映射
+     * @return keySet提供者，可以为null
+     */
+    protected abstract Supplier<Set<Object>> getKeySet();
 
+    @Override
+    public final Set<Object> keySet() {
+        if (getKeySet() == null || getKeySet().get() == null) {
+            return Collections.emptySet();
+        }
+        return Collections.unmodifiableSet(getKeySet().get());
+    }
 }

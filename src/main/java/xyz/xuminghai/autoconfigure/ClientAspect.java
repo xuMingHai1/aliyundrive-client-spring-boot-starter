@@ -36,9 +36,9 @@ import java.time.Instant;
 class ClientAspect {
 
     @Pointcut("execution(public * getCache())")
-    private void excludePointcut() {}
+    private void excludeMethodPointcut() {}
 
-    @Around("target(xyz.xuminghai.template.ReactiveClientTemplate) && !excludePointcut()")
+    @Around("target(xyz.xuminghai.template.ReactiveClientTemplate) && !excludeMethodPointcut()")
     private Object reactiveClientTemplateArdound(ProceedingJoinPoint pjp) throws Throwable {
         // 执行开始的时间戳
         final Instant startTime = Instant.now();
@@ -48,13 +48,15 @@ class ClientAspect {
         final Signature signature = pjp.getSignature();
 
         return mono.doOnError(throwable -> {
-            WebClientResponseException e = (WebClientResponseException) throwable;
-            log.error("发生的错误请求：{}", e.getMessage());
-            log.error("阿里云盘响应的错误信息：{}", e.getResponseBodyAsString());
+            if (throwable instanceof WebClientResponseException) {
+                WebClientResponseException e = (WebClientResponseException) throwable;
+                log.error("发生的错误请求：{}", e.getMessage());
+                log.error("阿里云盘响应的错误信息：{}", e.getResponseBodyAsString());
+            }
         }).doOnNext(o -> log.info("【{}#{}】执行成功耗时：{}", signature.getDeclaringTypeName(), signature.getName(), DurationUtils.between(startTime, Instant.now())));
     }
 
-    @Pointcut("target(xyz.xuminghai.template.BlockClientTemplate) && !excludePointcut()")
+    @Pointcut("target(xyz.xuminghai.template.BlockClientTemplate) && !excludeMethodPointcut()")
     private void blockClientTemplatePointcut() {
     }
 

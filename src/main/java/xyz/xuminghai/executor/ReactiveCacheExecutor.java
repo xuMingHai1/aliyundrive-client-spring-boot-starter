@@ -14,18 +14,16 @@ package xyz.xuminghai.executor;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.cache.Cache;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -34,33 +32,29 @@ import java.nio.file.Path;
  *
  * @author xuMingHai
  */
-public class ReactiveCacheExecutor implements ReactiveExecutor {
-
-    private final Cache cache;
+public class ReactiveCacheExecutor extends AbstractCacheExecutor implements ReactiveExecutor {
 
     private final ReactiveExecutor reactiveExecutor;
 
     public ReactiveCacheExecutor(Cache cache, ReactiveExecutor reactiveExecutor) {
-        this.cache = cache;
+        super(cache);
         this.reactiveExecutor = reactiveExecutor;
     }
-
 
     @SuppressWarnings("unchecked")
     @Override
     public Mono<ResponseEntity<ListResponse>> list(ListRequest listRequest) {
         final String key = "reactive_list_" + listRequest.hashCode();
         final ResponseEntity<ListResponse> listResponseEntity = (ResponseEntity<ListResponse>) cache.get(key);
-        Mono<ResponseEntity<ListResponse>> mono;
-
-        if (ObjectUtils.isEmpty(listResponseEntity)) {
-            mono = reactiveExecutor.list(listRequest)
-                    .doOnNext(responseEntity -> cache.put(key, responseEntity));
-        } else {
-            mono = Mono.just(listResponseEntity);
-        }
-
-        return mono;
+        return Mono.create(monoSink -> {
+            if (listResponseEntity == null) {
+                reactiveExecutor.list(listRequest)
+                        .doOnNext(responseEntity -> cache.put(key, responseEntity))
+                        .subscribe(monoSink::success, monoSink::error);
+            } else {
+                monoSink.success(listResponseEntity);
+            }
+        });
     }
 
 
@@ -68,34 +62,33 @@ public class ReactiveCacheExecutor implements ReactiveExecutor {
     @Override
     public Mono<ResponseEntity<SearchResponse>> search(SearchRequest searchRequest) {
         final String key = "reactive_search_" + searchRequest.hashCode();
-        final ResponseEntity<SearchResponse> searchResponseEntity = (ResponseEntity<SearchResponse>) cache.get(key);
-        Mono<ResponseEntity<SearchResponse>> mono;
-
-        if (ObjectUtils.isEmpty(searchResponseEntity)) {
-            mono = reactiveExecutor.search(searchRequest)
-                    .doOnNext(responseEntity -> cache.put(key, responseEntity));
-        } else {
-            mono = Mono.just(searchResponseEntity);
-        }
-
-        return mono;
+        final ResponseEntity<SearchResponse> responseResponseEntity = (ResponseEntity<SearchResponse>) cache.get(key);
+        return Mono.create(monoSink -> {
+            if (responseResponseEntity == null) {
+                reactiveExecutor.search(searchRequest)
+                        .doOnNext(responseEntity -> cache.put(key, responseEntity))
+                        .subscribe(monoSink::success, monoSink::error);
+            } else {
+                monoSink.success(responseResponseEntity);
+            }
+        });
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
     public Mono<ResponseEntity<BaseItem>> get(String fileId) {
         final String key = "reactive_get_" + fileId;
         final ResponseEntity<BaseItem> getResponseEntity = (ResponseEntity<BaseItem>) cache.get(key);
-        Mono<ResponseEntity<BaseItem>> mono;
-
-        if (ObjectUtils.isEmpty(getResponseEntity)) {
-            mono = reactiveExecutor.get(fileId)
-                    .doOnNext(responseEntity -> cache.put(key, responseEntity));
-        } else {
-            mono = Mono.just(getResponseEntity);
-        }
-
-        return mono;
+        return Mono.create(monoSink -> {
+            if (getResponseEntity == null) {
+                reactiveExecutor.get(fileId)
+                        .doOnNext(responseEntity -> cache.put(key, responseEntity))
+                        .subscribe(monoSink::success, monoSink::error);
+            } else {
+                monoSink.success(getResponseEntity);
+            }
+        });
     }
 
     @Override
@@ -132,5 +125,21 @@ public class ReactiveCacheExecutor implements ReactiveExecutor {
         cache.clear();
         return reactiveExecutor.update(updateRequest);
     }
+
+    @Override
+    public Mono<ResponseEntity<VideoPreviewPlayInfoResponse>> getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
+        return reactiveExecutor.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest);
+    }
+
+    @Override
+    public Mono<ResponseEntity<Resource>> getResource(URL url, MediaType mediaType) {
+        return reactiveExecutor.getResource(url, mediaType);
+    }
+
+    @Override
+    public Mono<ResponseEntity<Resource>> parseVideoUrl(URL url) {
+        return reactiveExecutor.parseVideoUrl(url);
+    }
+
 
 }

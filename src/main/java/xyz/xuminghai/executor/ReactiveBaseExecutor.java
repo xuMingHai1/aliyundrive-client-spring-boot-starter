@@ -14,18 +14,17 @@ package xyz.xuminghai.executor;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.core.ReactiveFileDao;
 import xyz.xuminghai.core.ReactiveRecycleDao;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
-import xyz.xuminghai.pojo.request.file.CreateFolderRequest;
-import xyz.xuminghai.pojo.request.file.ListRequest;
-import xyz.xuminghai.pojo.request.file.SearchRequest;
-import xyz.xuminghai.pojo.request.file.UpdateRequest;
+import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -34,15 +33,10 @@ import java.nio.file.Path;
  *
  * @author xuMingHai
  */
-public class ReactiveBaseExecutor implements ReactiveExecutor {
-
-    private final ReactiveFileDao reactiveFileDao;
-
-    private final ReactiveRecycleDao reactiveRecycleDao;
+public class ReactiveBaseExecutor extends AbstractExecutor implements ReactiveExecutor {
 
     public ReactiveBaseExecutor(ReactiveFileDao reactiveFileDao, ReactiveRecycleDao reactiveRecycleDao) {
-        this.reactiveFileDao = reactiveFileDao;
-        this.reactiveRecycleDao = reactiveRecycleDao;
+        super(reactiveFileDao, reactiveRecycleDao);
     }
 
     @Override
@@ -89,6 +83,22 @@ public class ReactiveBaseExecutor implements ReactiveExecutor {
     public Mono<ResponseEntity<BaseItem>> update(UpdateRequest updateRequest) {
         return reactiveFileDao.update(updateRequest)
                 .toEntity(BaseItem.class);
+    }
+
+    @Override
+    public Mono<ResponseEntity<VideoPreviewPlayInfoResponse>> getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
+        return reactiveFileDao.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest)
+                .toEntity(VideoPreviewPlayInfoResponse.class);
+    }
+
+    @Override
+    public Mono<ResponseEntity<Resource>> parseVideoUrl(URL url) {
+        return parseM3u8(url);
+    }
+
+    @Override
+    public Mono<ResponseEntity<Resource>> getResource(URL url, MediaType mediaType) {
+        return super.getResource(url, mediaType);
     }
 
 }
