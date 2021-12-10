@@ -60,6 +60,11 @@ public class LoggingDecorator implements Cache {
     }
 
     @Override
+    public void put(Object key, Object value, long timestampSeconds) {
+        cache.put(key, value, timestampSeconds);
+    }
+
+    @Override
     public Object get(Object key) {
         // 缓存是否命中
         boolean hit = false;

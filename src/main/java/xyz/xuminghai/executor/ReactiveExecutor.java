@@ -13,11 +13,9 @@
 package xyz.xuminghai.executor;
 
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
+import xyz.xuminghai.io.AliyunInputResource;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
 import xyz.xuminghai.pojo.request.file.*;
@@ -71,13 +69,11 @@ public interface ReactiveExecutor extends Executor {
     Mono<ResponseEntity<DownloadUrlResponse>> getDownloadUrl(String fileId);
 
     /**
-     * 下载文件，支持分段下载，断点续传
-     *
+     * 下载文件
      * @param fileId      文件ID
-     * @param httpHeaders 表示 HTTP 请求头
-     * @return Http异步响应体
+     * @return 文件资源
      */
-    Mono<ResponseEntity<Resource>> downloadFile(String fileId, HttpHeaders httpHeaders);
+    Mono<ResponseEntity<AliyunInputResource>> downloadFile(String fileId);
 
     /**
      * 根据创建文件夹的请求参数，发送创建文件夹的请求
@@ -126,18 +122,25 @@ public interface ReactiveExecutor extends Executor {
     Mono<ResponseEntity<VideoPreviewPlayInfoResponse>> getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest);
 
     /**
-     * 处理视频网址
-     * @param url 视频地址
-     * @return 响应的结果
+     * 获取视频资源
+     * @param url 视频资源路径
+     * @return 视频资源m3u8
      */
-    Mono<ResponseEntity<Resource>> parseVideoUrl(URL url);
+    Mono<ResponseEntity<AliyunInputResource>> getVideo(URL url);
 
     /**
-     * 使用get方式获取url的资源
+     * 获取url的资源
      * @param url 资源地址
-     * @param mediaType 返回的媒体类型
-     * @return 响应的结果
+     * @return 资源访问类
      */
-    Mono<ResponseEntity<Resource>> getResource(URL url, MediaType mediaType);
+    Mono<ResponseEntity<AliyunInputResource>> getResource(URL url);
+
+    /**
+     * 获取播放音频信息
+     * @param fileId 文件ID
+     * @return 响应后的操作
+     */
+    @Override
+    Mono<ResponseEntity<AudioPlayInfoResponse>> getAudioPlayInfo(String fileId);
 
 }

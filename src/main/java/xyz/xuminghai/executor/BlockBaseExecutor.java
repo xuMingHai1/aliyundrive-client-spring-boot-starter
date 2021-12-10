@@ -128,4 +128,11 @@ public class BlockBaseExecutor extends AbstractExecutor implements BlockExecutor
                 .bodyToMono(VideoPreviewPlayInfoResponse.class)
                 .block();
     }
+
+    @Override
+    public AudioPlayInfoResponse getAudioPlayInfo(String fileId) {
+        return reactiveFileDao.getAudioPlayInfo(fileId)
+                .bodyToMono(AudioPlayInfoResponse.class)
+                .block();
+    }
 }

@@ -13,10 +13,13 @@
 package xyz.xuminghai.test;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import xyz.xuminghai.io.AliyunInputResource;
 import xyz.xuminghai.pojo.response.file.UploadFolderResponse;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -93,5 +96,13 @@ public class OtherTest {
 
         System.out.println(uploadFolderResponse);
     }
+
+    @Test
+    void test1() throws IOException {
+        final URL url = new URL("");
+        final AliyunInputResource resource = new AliyunInputResource(url);
+        System.out.println(resource.getHttpHeaders().getContentType());
+    }
+
 
 }

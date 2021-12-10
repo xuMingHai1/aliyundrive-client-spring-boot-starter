@@ -12,6 +12,7 @@
 
 package xyz.xuminghai.cache;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +26,15 @@ import java.util.function.Supplier;
  */
 public class BaseCache extends AbstractCacheInstance {
 
+    /**
+     * 存放缓存内容的map
+     */
     private final Map<Object, Object> cache = new HashMap<>();
+
+    /**
+     * 存放带有过期时间key的map
+     */
+    private final Map<Object, Long> expirationMap = new HashMap<>();
 
     @Override
     public void put(Object key, Object value) {
@@ -33,18 +42,36 @@ public class BaseCache extends AbstractCacheInstance {
     }
 
     @Override
+    public void put(Object key, Object value, long timestampSeconds) {
+        cache.put(key, value);
+        expirationMap.put(key, timestampSeconds);
+    }
+
+    @Override
     public Object get(Object key) {
+        final Long timestampSeconds = expirationMap.get(key);
+        // 如果这个key存在过期时间
+        if (timestampSeconds != null) {
+            // 判断这个key是否已经过期，如果已经过期删除缓存，返回null
+            if (Instant.now().getEpochSecond() > timestampSeconds) {
+                expirationMap.remove(key);
+                cache.remove(key);
+                return null;
+            }
+        }
         return cache.get(key);
     }
 
     @Override
     public void remove(Object key) {
         cache.remove(key);
+        expirationMap.remove(key);
     }
 
     @Override
     public void clear() {
         cache.clear();
+        expirationMap.clear();
     }
 
     @Override

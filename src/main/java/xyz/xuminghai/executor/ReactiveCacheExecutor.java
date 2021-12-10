@@ -12,19 +12,21 @@
 
 package xyz.xuminghai.executor;
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.cache.Cache;
+import xyz.xuminghai.io.AliyunInputResource;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
 import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
+import xyz.xuminghai.util.UrlUtils;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * 2021/10/25 16:39 星期一<br/>
@@ -41,64 +43,37 @@ public class ReactiveCacheExecutor extends AbstractCacheExecutor implements Reac
         this.reactiveExecutor = reactiveExecutor;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Mono<ResponseEntity<ListResponse>> list(ListRequest listRequest) {
         final String key = "reactive_list_" + listRequest.hashCode();
-        final ResponseEntity<ListResponse> listResponseEntity = (ResponseEntity<ListResponse>) cache.get(key);
-        return Mono.create(monoSink -> {
-            if (listResponseEntity == null) {
-                reactiveExecutor.list(listRequest)
-                        .doOnNext(responseEntity -> cache.put(key, responseEntity))
-                        .subscribe(monoSink::success, monoSink::error);
-            } else {
-                monoSink.success(listResponseEntity);
-            }
-        });
+        return getAndPutDefaultTimeout(key, () -> reactiveExecutor.list(listRequest));
     }
 
-
-    @SuppressWarnings("unchecked")
     @Override
     public Mono<ResponseEntity<SearchResponse>> search(SearchRequest searchRequest) {
         final String key = "reactive_search_" + searchRequest.hashCode();
-        final ResponseEntity<SearchResponse> responseResponseEntity = (ResponseEntity<SearchResponse>) cache.get(key);
-        return Mono.create(monoSink -> {
-            if (responseResponseEntity == null) {
-                reactiveExecutor.search(searchRequest)
-                        .doOnNext(responseEntity -> cache.put(key, responseEntity))
-                        .subscribe(monoSink::success, monoSink::error);
-            } else {
-                monoSink.success(responseResponseEntity);
-            }
-        });
+        return getAndPutDefaultTimeout(key, () -> reactiveExecutor.search(searchRequest));
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public Mono<ResponseEntity<BaseItem>> get(String fileId) {
         final String key = "reactive_get_" + fileId;
-        final ResponseEntity<BaseItem> getResponseEntity = (ResponseEntity<BaseItem>) cache.get(key);
-        return Mono.create(monoSink -> {
-            if (getResponseEntity == null) {
-                reactiveExecutor.get(fileId)
-                        .doOnNext(responseEntity -> cache.put(key, responseEntity))
-                        .subscribe(monoSink::success, monoSink::error);
-            } else {
-                monoSink.success(getResponseEntity);
-            }
-        });
+        return getAndPutDefaultTimeout(key, () -> reactiveExecutor.get(fileId));
     }
 
     @Override
     public Mono<ResponseEntity<DownloadUrlResponse>> getDownloadUrl(String fileId) {
-        return reactiveExecutor.getDownloadUrl(fileId);
+        final String key = "reactive_getDownloadUrl_" + fileId;
+        return get(key, () -> reactiveExecutor.getDownloadUrl(fileId)
+                .doOnNext(t -> cache.put(key, t, UrlUtils.getTimeoutStamp(Objects.requireNonNull(t.getBody()).getUrl()))));
     }
 
     @Override
-    public Mono<ResponseEntity<Resource>> downloadFile(String fileId, HttpHeaders httpHeaders) {
-        return reactiveExecutor.downloadFile(fileId, httpHeaders);
+    public Mono<ResponseEntity<AliyunInputResource>> downloadFile(String fileId) {
+        final String key = "reactive_downloadFile_" + fileId;
+        return get(key, () -> reactiveExecutor.downloadFile(fileId)
+                .doOnNext(t -> cache.put(key, t, Objects.requireNonNull(t.getBody()).getTimeoutStampSeconds())));
     }
 
     @Override
@@ -128,18 +103,79 @@ public class ReactiveCacheExecutor extends AbstractCacheExecutor implements Reac
 
     @Override
     public Mono<ResponseEntity<VideoPreviewPlayInfoResponse>> getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
-        return reactiveExecutor.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest);
+        final String key = "reactive_getVideoPreviewPlayInfo_" + videoPreviewPlayInfoRequest.getFileId();
+        return get(key, () -> reactiveExecutor.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest)
+                .doOnNext(t -> cache.put(key, t, UrlUtils.getTimeoutStamp(Objects.requireNonNull(t.getBody())
+                        .getVideoPreviewPlayInfo()
+                        .getLiveTranscodingTaskList()
+                        .get(0)
+                        .getUrl()))));
     }
 
     @Override
-    public Mono<ResponseEntity<Resource>> getResource(URL url, MediaType mediaType) {
-        return reactiveExecutor.getResource(url, mediaType);
+    public Mono<ResponseEntity<AliyunInputResource>> getResource(URL url) {
+        final String key = "reactive_getResource_" + url;
+        return get(key, () -> reactiveExecutor.getResource(url)
+                .doOnNext(t -> cache.put(key, t, Objects.requireNonNull(t.getBody()).getTimeoutStampSeconds())));
     }
 
     @Override
-    public Mono<ResponseEntity<Resource>> parseVideoUrl(URL url) {
-        return reactiveExecutor.parseVideoUrl(url);
+    public Mono<ResponseEntity<AliyunInputResource>> getVideo(URL url) {
+        final String key = "reactive_getVideo_" + url;
+        return get(key, () -> reactiveExecutor.getVideo(url)
+                .doOnNext(t -> cache.put(key, t, Objects.requireNonNull(t.getBody()).getTimeoutStampSeconds())));
     }
 
+
+    @Override
+    public Mono<ResponseEntity<AudioPlayInfoResponse>> getAudioPlayInfo(String fileId) {
+        final String key = "reactive_getAudioPlayInfo_" + fileId;
+        return get(key, () -> reactiveExecutor.getAudioPlayInfo(fileId)
+                .doOnNext(t -> cache.put(key, t, UrlUtils.getTimeoutStamp(Objects.requireNonNull(t.getBody())
+                        .getTemplateList()
+                        .get(0)
+                        .getUrl()))));
+    }
+
+    /**
+     * 获取缓存并返回，如果没有则从供应商添加缓存设置默认的缓存超时时间并返回
+     * @param key 缓存的key
+     * @param supplier 提供缓存元素
+     * @param <T> 缓存元素类型
+     * @return 返回的响应
+     */
+    private <T> Mono<T> getAndPutDefaultTimeout(String key, Supplier<Mono<T>> supplier) {
+        return get(key, () -> supplier.get()
+                .doOnNext(t -> cache.put(key, t, UrlUtils.getTimeoutStamp(null))));
+    }
+
+    /**
+     * 获取缓存并返回，如果没有则从供应商添加缓存并返回
+     * @param key 缓存的key
+     * @param supplier 提供缓存元素
+     * @param <T> 缓存元素类型
+     * @return 返回的响应
+     */
+    private <T> Mono<T> getAndPut(String key, Supplier<Mono<T>> supplier) {
+        return get(key, () -> supplier.get()
+                .doOnNext(t -> cache.put(key, t)));
+    }
+
+    /**
+     * 获取缓存并返回
+     * @param key 缓存的key
+     * @param supplier 提供缓存元素
+     * @param <T> 缓存元素类型
+     * @return 返回的响应
+     */
+    @SuppressWarnings("unchecked")
+    private <T> Mono<T> get(String key, Supplier<Mono<T>> supplier) {
+        // 从缓存中获取元素
+        return Mono.justOrEmpty((T) cache.get(key))
+                // 获取超时时间
+                .timeout(Duration.ofMillis(GET_CACHE_TIMEOUT))
+                // 如果获取的元素为null，则返回供应商
+                .switchIfEmpty(supplier.get());
+    }
 
 }

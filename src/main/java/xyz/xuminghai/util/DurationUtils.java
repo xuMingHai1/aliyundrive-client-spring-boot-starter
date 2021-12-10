@@ -40,19 +40,19 @@ public final class DurationUtils {
         // 如果小时不为0
         final long hours = between.toHours();
         if (hours > 0) {
-            sb.append(hours % 24).append("小时，");
+            sb.append(hours & (24 - 1)).append("小时，");
         }
 
         // 如果分钟不为0
         final long minutes = between.toMinutes();
         if (minutes > 0) {
-            sb.append(minutes % 60).append("分钟，");
+            sb.append(minutes & (60 - 1)).append("分钟，");
         }
 
         // 如果秒不为0
         final long seconds = between.getSeconds();
         if (seconds > 0) {
-            sb.append(seconds % 60).append("秒，");
+            sb.append(seconds & (60 - 1)).append("秒，");
         }
 
         final long millis = between.getNano() / 1000_000;

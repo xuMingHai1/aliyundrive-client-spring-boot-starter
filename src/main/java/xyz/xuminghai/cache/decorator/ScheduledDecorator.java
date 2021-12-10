@@ -53,6 +53,11 @@ public class ScheduledDecorator implements Cache {
     }
 
     @Override
+    public void put(Object key, Object value, long timestampSeconds) {
+        cache.put(key, value, timestampSeconds);
+    }
+
+    @Override
     public Object get(Object key) {
         return cache.get(key);
     }

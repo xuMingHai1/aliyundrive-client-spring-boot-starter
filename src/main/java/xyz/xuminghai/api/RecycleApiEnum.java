@@ -16,21 +16,20 @@ import lombok.Getter;
 import org.springframework.http.HttpMethod;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * 2021/10/10 14:03 星期日<br/>
- * 回收站api
+ * 阿里云盘回收站操作接口
  *
  * @author xuMingHai
  */
 @Getter
-public enum RecycleEnum {
+public enum RecycleApiEnum {
 
     /**
      * 移动到回收站
      */
-    TRASH(getUri("https://api.aliyundrive.com/v2/recyclebin/trash"), HttpMethod.POST);
+    TRASH(URI.create("https://api.aliyundrive.com/v2/recyclebin/trash"), HttpMethod.POST);
 
 
     /**
@@ -43,18 +42,9 @@ public enum RecycleEnum {
      */
     private final HttpMethod httpMethod;
 
-    RecycleEnum(URI api, HttpMethod httpMethod) {
+    RecycleApiEnum(URI api, HttpMethod httpMethod) {
         this.api = api;
         this.httpMethod = httpMethod;
-    }
-
-    static URI getUri(String str) {
-        try {
-            return new URI(str);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }

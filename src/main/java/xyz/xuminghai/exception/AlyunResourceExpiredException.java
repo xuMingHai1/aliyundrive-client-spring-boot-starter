@@ -10,29 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-package xyz.xuminghai.executor;
-
-import xyz.xuminghai.core.ReactiveFileDao;
-import xyz.xuminghai.core.ReactiveRecycleDao;
+package xyz.xuminghai.exception;
 
 /**
- * 2021/11/26 20:16 星期五<br/>
- * 抽象地执行器
+ * 2021/12/3 8:42 星期五<br/>
+ * 阿里云盘资源过期，当资源的时间戳已经到了，表示这个资源已经过期无法访问
  * @author xuMingHai
  */
-abstract class AbstractExecutor implements Executor{
+public class AlyunResourceExpiredException extends RuntimeException{
 
-    final ReactiveFileDao reactiveFileDao;
-
-    final ReactiveRecycleDao reactiveRecycleDao;
-
-    AbstractExecutor(ReactiveFileDao reactiveFileDao, ReactiveRecycleDao reactiveRecycleDao) {
-        this.reactiveFileDao = reactiveFileDao;
-        this.reactiveRecycleDao = reactiveRecycleDao;
+    public AlyunResourceExpiredException(String message) {
+        super(message);
     }
-
-
-
-
-
 }

@@ -13,7 +13,7 @@
 package xyz.xuminghai.core.impl;
 
 import org.springframework.web.reactive.function.client.WebClient;
-import xyz.xuminghai.api.RecycleEnum;
+import xyz.xuminghai.api.RecycleApiEnum;
 import xyz.xuminghai.core.AbstractReactiveDao;
 import xyz.xuminghai.core.ReactiveRecycleDao;
 import xyz.xuminghai.pojo.request.FileIdRequest;
@@ -33,7 +33,7 @@ public class ReactiveRecycleDaoImpl extends AbstractReactiveDao implements React
     @Override
     public WebClient.ResponseSpec trash(String fileId) {
         final FileIdRequest fileIdRequest = new FileIdRequest(fileId);
-        final RecycleEnum trash = RecycleEnum.TRASH;
+        final RecycleApiEnum trash = RecycleApiEnum.TRASH;
         return sendRequest(trash.getHttpMethod(), trash.getApi(), fileIdRequest);
     }
 }

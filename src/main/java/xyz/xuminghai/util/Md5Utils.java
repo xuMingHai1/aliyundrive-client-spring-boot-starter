@@ -29,7 +29,7 @@ public final class Md5Utils {
 
 
     /**
-     * 进行md5摘要
+     * 对数据进行md5摘要
      *
      * @param bytes 要进行摘要的消息
      * @return md5值

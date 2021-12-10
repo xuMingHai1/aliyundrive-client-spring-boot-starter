@@ -16,66 +16,65 @@ import lombok.Getter;
 import org.springframework.http.HttpMethod;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * 2021/10/10 13:59 星期日<br/>
- * 文件api
+ * 阿里云盘文件操作的接口
  *
  * @author xuMingHai
  */
 @Getter
-public enum FileEnum {
+public enum FileApiEnum {
 
     /**
      * 查询指定文件
      */
-    GET(getUri("https://api.aliyundrive.com/v2/file/get"), HttpMethod.POST),
+    GET(URI.create("https://api.aliyundrive.com/v2/file/get"), HttpMethod.POST),
 
     /**
      * 获取指定文件的下载地址
      */
-    GET_DOWNLOAD_URL(getUri("https://api.aliyundrive.com/v2/file/get_download_url"), HttpMethod.POST),
+    GET_DOWNLOAD_URL(URI.create("https://api.aliyundrive.com/v2/file/get_download_url"), HttpMethod.POST),
 
     /**
      * 查询指定目录的文件
      */
-    LIST(getUri("https://api.aliyundrive.com/adrive/v3/file/list"), HttpMethod.POST),
+    LIST(URI.create("https://api.aliyundrive.com/adrive/v3/file/list"), HttpMethod.POST),
 
     /**
      * 搜索文件
      */
-    SEARCH(getUri("https://api.aliyundrive.com/adrive/v3/file/search"), HttpMethod.POST),
+    SEARCH(URI.create("https://api.aliyundrive.com/adrive/v3/file/search"), HttpMethod.POST),
 
     /**
      * 多个文件下载
      */
-    MULTI_DOWNLOAD_URL(getUri("https://api.aliyundrive.com/adrive/v1/file/multiDownloadUrl"), HttpMethod.POST),
+    MULTI_DOWNLOAD_URL(URI.create("https://api.aliyundrive.com/adrive/v1/file/multiDownloadUrl"), HttpMethod.POST),
 
     /**
      * 创建文件夹或文件
      */
-    CREATE_WITH_FOLDERS(getUri("https://api.aliyundrive.com/adrive/v2/file/createWithFolders"), HttpMethod.POST),
+    CREATE_WITH_FOLDERS(URI.create("https://api.aliyundrive.com/adrive/v2/file/createWithFolders"), HttpMethod.POST),
 
     /**
      * 修改文件名
      */
-    UPDATE(getUri("https://api.aliyundrive.com/v3/file/update"), HttpMethod.POST),
+    UPDATE(URI.create("https://api.aliyundrive.com/v3/file/update"), HttpMethod.POST),
 
     /**
      * 上传文件后，完全性检查
      */
-    COMPLETE(getUri("https://api.aliyundrive.com/v2/file/complete"), HttpMethod.POST),
+    COMPLETE(URI.create("https://api.aliyundrive.com/v2/file/complete"), HttpMethod.POST),
 
     /**
      * 获取视频预览播放信息
      */
-    GET_VIDEO_PREVIEW_PLAY_INFO(getUri("https://api.aliyundrive.com/v2/file/get_video_preview_play_info"), HttpMethod.POST),
+    GET_VIDEO_PREVIEW_PLAY_INFO(URI.create("https://api.aliyundrive.com/v2/file/get_video_preview_play_info"), HttpMethod.POST),
 
     /**
      * 获取音频播放信息
      */
-    GET_AUDIO_PLAY_INFO(getUri("https://api.aliyundrive.com/v2/databox/get_audio_play_info"), HttpMethod.POST);
+    GET_AUDIO_PLAY_INFO(URI.create("https://api.aliyundrive.com/v2/databox/get_audio_play_info"), HttpMethod.POST);
 
 
     /**
@@ -88,18 +87,9 @@ public enum FileEnum {
      */
     private final HttpMethod httpMethod;
 
-    FileEnum(URI api, HttpMethod httpMethod) {
+    FileApiEnum(URI api, HttpMethod httpMethod) {
         this.api = api;
         this.httpMethod = httpMethod;
-    }
-
-    static URI getUri(String str) {
-        try {
-            return new URI(str);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }

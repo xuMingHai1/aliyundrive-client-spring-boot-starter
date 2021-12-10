@@ -24,31 +24,36 @@ import java.util.Set;
 public interface Cache {
 
     /**
-     * 获取缓存名
-     *
-     * @return 缓存名
+     * 获取缓存实例名
+     * @return 缓存实例名
      */
     String getName();
 
     /**
      * 添加缓存内容
-     *
-     * @param key   请求
-     * @param value 响应
+     * @param key   key
+     * @param value value
      */
     void put(Object key, Object value);
 
     /**
+     * 设置带有过期时间的添加缓存（*** 注意这个是时间戳秒）
+     * @param key key
+     * @param value value
+     * @param timestampSeconds 时间戳-秒
+     */
+    void put(Object key, Object value, long timestampSeconds);
+
+    /**
      * 根据这个请求获取响应内容
-     *
-     * @param key 请求
-     * @return 响应，如果值不存在为null
+     * @param key key
+     * @return value，如果值不存在为null
      */
     Object get(Object key);
 
     /**
      * 删除指定的缓存
-     * @param key 请求
+     * @param key key
      */
     void remove(Object key);
 
@@ -58,15 +63,14 @@ public interface Cache {
     void clear();
 
     /**
-     * 获取这个缓存实例的元素个数
-     *
+     * 获取缓存元素的个数
      * @return 缓存元素的个数
      */
     long size();
 
     /**
      * 获取这个缓存实例中所有的key，只读的set集合
-     * @return key的set集合，如果没有key则是空的set集合
+     * @return key的set集合，如果没有key则是空的set集合，从来不会返回null
      */
     Set<Object> keySet();
 

@@ -20,6 +20,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
+import xyz.xuminghai.io.AliyunInputResource;
+import xyz.xuminghai.io.AliyunVideoResource;
 
 import java.util.ArrayList;
 
@@ -30,18 +32,21 @@ import java.util.ArrayList;
  */
 public class KryoSerializer implements Serializer{
 
-    private static Class<?> ReadOnlyHttpHeadersClass;
+    private static final Class<?> READ_ONLY_HTTP_HEADERS_CLASS;
 
-    private static Class<?> HeadersUtils$1Class;
+    private static final Class<?> HEADERS_UTILS_$_1_CLASS;
+
+    private static final Class<?> UNMODIFIABLE_RANDOM_ACCESS_LIST;
 
     private static final int MAX_CAPACITY = Runtime.getRuntime().availableProcessors() * 2;
 
     static {
         try {
-            ReadOnlyHttpHeadersClass = Class.forName("org.springframework.http.ReadOnlyHttpHeaders");
-            HeadersUtils$1Class = Class.forName("io.netty.handler.codec.HeadersUtils$1");
+            READ_ONLY_HTTP_HEADERS_CLASS = Class.forName("org.springframework.http.ReadOnlyHttpHeaders");
+            HEADERS_UTILS_$_1_CLASS = Class.forName("io.netty.handler.codec.HeadersUtils$1");
+            UNMODIFIABLE_RANDOM_ACCESS_LIST = Class.forName("java.util.Collections$UnmodifiableRandomAccessList");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+           throw new Error(e);
         }
     }
 
@@ -51,6 +56,10 @@ public class KryoSerializer implements Serializer{
         protected Kryo create() {
             final Kryo kryo = new Kryo();
             kryo.setRegistrationRequired(false);
+
+            // 注册要序列化的类
+            kryo.register(AliyunInputResource.class, 9);
+            kryo.register(AliyunVideoResource.class, 10);
 
             // 自定义创建对象实例
             kryo.register(ResponseEntity.class)
@@ -62,10 +71,13 @@ public class KryoSerializer implements Serializer{
                 为了反序列化变为了可以修改，这样可能会有一些问题
                 不过问题应该不大
              */
-            kryo.register(ReadOnlyHttpHeadersClass)
+            kryo.register(READ_ONLY_HTTP_HEADERS_CLASS)
                     .setInstantiator(HttpHeaders::new);
 
-            kryo.register(HeadersUtils$1Class)
+            kryo.register(HEADERS_UTILS_$_1_CLASS)
+                    .setInstantiator(ArrayList::new);
+
+            kryo.register(UNMODIFIABLE_RANDOM_ACCESS_LIST)
                     .setInstantiator(ArrayList::new);
 
             return kryo;

@@ -120,4 +120,8 @@ public class BlockCacheExecutor extends AbstractCacheExecutor implements BlockEx
         return blockExecutor.getVideoPreviewPlayInfo(videoPreviewPlayInfoRequest);
     }
 
+    @Override
+    public AudioPlayInfoResponse getAudioPlayInfo(String fileId) {
+        return blockExecutor.getAudioPlayInfo(fileId);
+    }
 }

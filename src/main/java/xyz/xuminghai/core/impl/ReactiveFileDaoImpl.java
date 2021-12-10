@@ -18,16 +18,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import xyz.xuminghai.api.FileEnum;
+import xyz.xuminghai.api.FileApiEnum;
 import xyz.xuminghai.core.AbstractReactiveDao;
 import xyz.xuminghai.core.ReactiveFileDao;
-import xyz.xuminghai.io.DownloadResource;
 import xyz.xuminghai.pojo.entity.upload.UploadStatus;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
 import xyz.xuminghai.pojo.request.FileIdRequest;
 import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.CreateFileResponse;
-import xyz.xuminghai.pojo.response.file.DownloadUrlResponse;
 import xyz.xuminghai.util.HashUtils;
 import xyz.xuminghai.util.IoUtils;
 import xyz.xuminghai.util.ProofV1Utils;
@@ -70,46 +68,31 @@ public class ReactiveFileDaoImpl extends AbstractReactiveDao implements Reactive
 
     @Override
     public WebClient.ResponseSpec list(ListRequest listRequest) {
-        final FileEnum list = FileEnum.LIST;
+        final FileApiEnum list = FileApiEnum.LIST;
         return sendRequest(list.getHttpMethod(), list.getApi(), listRequest);
     }
 
     @Override
     public WebClient.ResponseSpec search(SearchRequest searchRequest) {
-        final FileEnum search = FileEnum.SEARCH;
+        final FileApiEnum search = FileApiEnum.SEARCH;
         return sendRequest(search.getHttpMethod(), search.getApi(), searchRequest);
     }
 
     @Override
     public WebClient.ResponseSpec get(String fileId) {
-        final FileIdRequest fileIdRequest = new FileIdRequest(fileId);
-        final FileEnum get = FileEnum.GET;
-        return sendRequest(get.getHttpMethod(), get.getApi(), fileIdRequest);
+        final FileApiEnum get = FileApiEnum.GET;
+        return sendRequest(get.getHttpMethod(), get.getApi(), new GetRequest(fileId));
     }
 
     @Override
     public WebClient.ResponseSpec getDownloadUrl(String fileId) {
-        final FileIdRequest fileIdRequest = new FileIdRequest(fileId);
-        final FileEnum getDownloadUrl = FileEnum.GET_DOWNLOAD_URL;
-        return sendRequest(getDownloadUrl.getHttpMethod(), getDownloadUrl.getApi(), fileIdRequest);
-    }
-
-    @Override
-    public Mono<ResponseEntity<Resource>> downloadFile(String fileId, HttpHeaders requestHttpHeaders) {
-        return getDownloadUrl(fileId).bodyToMono(DownloadUrlResponse.class)
-                .mapNotNull(downloadUrlResponse -> {
-                    try {
-                        return DownloadResource.createResource(downloadUrlResponse, requestHttpHeaders);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }).map(downloadResource -> new ResponseEntity<>(downloadResource, downloadResource.getResponseHttpHeaders(), downloadResource.getHttpStatus()));
+        final FileApiEnum getDownloadUrl = FileApiEnum.GET_DOWNLOAD_URL;
+        return sendRequest(getDownloadUrl.getHttpMethod(), getDownloadUrl.getApi(), new FileIdRequest(fileId));
     }
 
     @Override
     public WebClient.ResponseSpec getMultiDownloadUrl(MultiDownloadUrlRequest multiDownloadUrlRequest) {
-        final FileEnum multiDownloadUrl = FileEnum.MULTI_DOWNLOAD_URL;
+        final FileApiEnum multiDownloadUrl = FileApiEnum.MULTI_DOWNLOAD_URL;
         return webClient.method(multiDownloadUrl.getHttpMethod()).uri(multiDownloadUrl.getApi())
                 .bodyValue(multiDownloadUrlRequest)
                 .retrieve();
@@ -123,7 +106,7 @@ public class ReactiveFileDaoImpl extends AbstractReactiveDao implements Reactive
 
     @Override
     public WebClient.ResponseSpec createFolder(CreateFolderRequest createFolderRequest) {
-        final FileEnum createWithFolders = FileEnum.CREATE_WITH_FOLDERS;
+        final FileApiEnum createWithFolders = FileApiEnum.CREATE_WITH_FOLDERS;
         return sendRequest(createWithFolders.getHttpMethod(), createWithFolders.getApi(), createFolderRequest);
     }
 
@@ -209,7 +192,7 @@ public class ReactiveFileDaoImpl extends AbstractReactiveDao implements Reactive
                     e.printStackTrace();
                 }
                 final CompleteRequest completeRequest = new CompleteRequest(createFileResponse.getFileId(), createFileResponse.getUploadId());
-                final FileEnum complete = FileEnum.COMPLETE;
+                final FileApiEnum complete = FileApiEnum.COMPLETE;
                 webClient.method(complete.getHttpMethod()).uri(complete.getApi())
                         .bodyValue(completeRequest)
                         .retrieve()
@@ -247,6 +230,7 @@ public class ReactiveFileDaoImpl extends AbstractReactiveDao implements Reactive
             connection.setRequestProperty(HttpHeaders.CONNECTION, "keep-alive");
             connection.setRequestProperty(HttpHeaders.REFERER, "https://www.aliyundrive.com/");
             connection.setUseCaches(false);
+            connection.disconnect();
             // 获取连接
             connection.connect();
             if (log.isDebugEnabled()) {
@@ -286,7 +270,7 @@ public class ReactiveFileDaoImpl extends AbstractReactiveDao implements Reactive
 
     private Mono<CreateFileResponse> upload(CreateFileRequest createFileRequest, int i) {
         // 发送请求
-        final FileEnum createWithFolders = FileEnum.CREATE_WITH_FOLDERS;
+        final FileApiEnum createWithFolders = FileApiEnum.CREATE_WITH_FOLDERS;
         final int frequency = i;
         return webClient.method(createWithFolders.getHttpMethod()).uri(createWithFolders.getApi())
                 .bodyValue(createFileRequest)
@@ -305,14 +289,19 @@ public class ReactiveFileDaoImpl extends AbstractReactiveDao implements Reactive
 
     @Override
     public WebClient.ResponseSpec update(UpdateRequest updateRequest) {
-        final FileEnum update = FileEnum.UPDATE;
+        final FileApiEnum update = FileApiEnum.UPDATE;
         return sendRequest(update.getHttpMethod(), update.getApi(), updateRequest);
     }
 
     @Override
     public WebClient.ResponseSpec getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest) {
-        final FileEnum getVideoPreviewPlayInfo = FileEnum.GET_VIDEO_PREVIEW_PLAY_INFO;
+        final FileApiEnum getVideoPreviewPlayInfo = FileApiEnum.GET_VIDEO_PREVIEW_PLAY_INFO;
         return sendRequest(getVideoPreviewPlayInfo.getHttpMethod(), getVideoPreviewPlayInfo.getApi(), videoPreviewPlayInfoRequest);
     }
 
+    @Override
+    public WebClient.ResponseSpec getAudioPlayInfo(String fileId) {
+        final FileApiEnum getAudioPlayInfo = FileApiEnum.GET_AUDIO_PLAY_INFO;
+        return sendRequest(getAudioPlayInfo.getHttpMethod(), getAudioPlayInfo.getApi(), new FileIdRequest(fileId));
+    }
 }

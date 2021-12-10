@@ -12,20 +12,21 @@
 
 package xyz.xuminghai.executor;
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.core.ReactiveFileDao;
 import xyz.xuminghai.core.ReactiveRecycleDao;
+import xyz.xuminghai.io.AliyunInputResource;
+import xyz.xuminghai.io.AliyunVideoResource;
 import xyz.xuminghai.pojo.entity.BaseItem;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
 import xyz.xuminghai.pojo.request.file.*;
 import xyz.xuminghai.pojo.response.file.*;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Objects;
 
 /**
  * 2021/10/25 17:06 星期一<br/>
@@ -65,8 +66,8 @@ public class ReactiveBaseExecutor extends AbstractExecutor implements ReactiveEx
     }
 
     @Override
-    public Mono<ResponseEntity<Resource>> downloadFile(String fileId, HttpHeaders httpHeaders) {
-        return reactiveFileDao.downloadFile(fileId, httpHeaders);
+    public Mono<ResponseEntity<AliyunInputResource>> downloadFile(String fileId) {
+        return getDownloadUrl(fileId).flatMap(entity -> getResource((Objects.requireNonNull(entity.getBody()).getUrl())));
     }
 
     @Override
@@ -92,13 +93,26 @@ public class ReactiveBaseExecutor extends AbstractExecutor implements ReactiveEx
     }
 
     @Override
-    public Mono<ResponseEntity<Resource>> parseVideoUrl(URL url) {
-        return parseM3u8(url);
+    public Mono<ResponseEntity<AliyunInputResource>> getVideo(URL url) {
+        try {
+            return Mono.just(new AliyunVideoResource(url).getResponseEntity());
+        } catch (IOException e) {
+            return Mono.error(e);
+        }
     }
 
     @Override
-    public Mono<ResponseEntity<Resource>> getResource(URL url, MediaType mediaType) {
-        return super.getResource(url, mediaType);
+    public Mono<ResponseEntity<AliyunInputResource>> getResource(URL url) {
+        try {
+            return Mono.just(new AliyunInputResource(url).getResponseEntity());
+        } catch (IOException e) {
+            return Mono.error(e);
+        }
     }
 
+    @Override
+    public Mono<ResponseEntity<AudioPlayInfoResponse>> getAudioPlayInfo(String fileId) {
+        return reactiveFileDao.getAudioPlayInfo(fileId)
+                .toEntity(AudioPlayInfoResponse.class);
+    }
 }

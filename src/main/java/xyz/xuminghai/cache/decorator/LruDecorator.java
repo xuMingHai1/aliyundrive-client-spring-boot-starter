@@ -78,11 +78,20 @@ public class LruDecorator implements Cache {
     }
 
     @Override
+    public void put(Object key, Object value, long timestampSeconds) {
+        cache.put(key, value, timestampSeconds);
+        lruMap.put(key, new LongAdder());
+    }
+
+    @Override
     public Object get(Object key) {
         final Object value = cache.get(key);
         if (value != null) {
             // 查询时对访问量进行原子自增
             lruMap.get(key).increment();
+        } else {
+            // 如果key不存在，可能是已经过期，尝试删除LruMap中可能存在的key
+            lruMap.remove(key);
         }
         return value;
     }

@@ -15,14 +15,12 @@ package xyz.xuminghai.test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import xyz.xuminghai.io.AliyunInputResource;
 import xyz.xuminghai.pojo.entity.video.LiveTranscodingTask;
 import xyz.xuminghai.pojo.response.file.ListResponse;
 import xyz.xuminghai.pojo.response.file.SearchResponse;
@@ -59,8 +57,8 @@ public class ReactiveClientTest {
     }
 
     @RequestMapping("/download/{fileId}")
-    Mono<ResponseEntity<Resource>> download(@PathVariable String fileId, @RequestHeader HttpHeaders httpHeaders) {
-        return reactiveClientTemplate.downloadFile(fileId, httpHeaders);
+    Mono<ResponseEntity<AliyunInputResource>> download(@PathVariable String fileId) {
+        return reactiveClientTemplate.downloadFile(fileId);
     }
 
     /**
@@ -68,25 +66,57 @@ public class ReactiveClientTest {
      * @param fileId 文件ID
      * @return M3u8文件
      */
-    @RequestMapping("/playVideo/{fileId}.m3u8")
-    Mono<ResponseEntity<Resource>> playVideo(@PathVariable String fileId) {
+    @RequestMapping("/playVideo/{fileId}")
+    Mono<ResponseEntity<AliyunInputResource>> playVideo(@PathVariable String fileId) {
         return reactiveClientTemplate.getVideoPreviewPlayInfo(fileId)
                 .flatMap(entity -> {
                     final List<LiveTranscodingTask> list = Objects.requireNonNull(entity.getBody()).getVideoPreviewPlayInfo().getLiveTranscodingTaskList();
-                    System.out.println(list.get(list.size() - 1).getUrl());
-                    return reactiveClientTemplate.palyVideo(list.get(list.size() - 1).getUrl());
-
+                    return reactiveClientTemplate.getVideo(list.get(list.size() - 1).getUrl());
                 });
     }
 
     /**
+     * 获取视频缩略图
+     * @param fileId 文件ID
+     * @return 视频缩略图
+     */
+    @RequestMapping("/getVideoThumbnail/{fileId}")
+    Mono<ResponseEntity<AliyunInputResource>> getVideoThumbnail(@PathVariable String fileId) {
+        return reactiveClientTemplate.getVideoThumbnail(fileId);
+    }
+
+    /**
      * 获取图片资源
-     * @param fileId 图片ID
+     * @param fileId 文件ID
      * @return 图片资源
      */
     @RequestMapping("/getImage/{fileId}")
-    Mono<ResponseEntity<Resource>> getImage(@PathVariable String fileId) {
-        return reactiveClientTemplate.getImage(fileId, false);
+    Mono<ResponseEntity<AliyunInputResource>> getImage(@PathVariable String fileId) {
+        return reactiveClientTemplate.getImage(fileId);
+    }
+
+
+    /**
+     * 获取文档资源
+     * @param fileId 文件ID
+     * @return 文档资源
+     */
+    @RequestMapping("/getDoc/{fileId}")
+    Mono<ResponseEntity<AliyunInputResource>> getDoc(@PathVariable String fileId) {
+        return reactiveClientTemplate.getDoc(fileId);
+    }
+
+    /**
+     * 播放音频，可以添加到播放器中
+     * @param fileId 文件ID
+     * @return 音频资源
+     */
+    @RequestMapping("/playAudio/{fileId}")
+    Mono<ResponseEntity<AliyunInputResource>> playAudio(@PathVariable String fileId) {
+        return reactiveClientTemplate.getAudioPlayInfo(fileId).flatMap(entity -> reactiveClientTemplate.getAudio(Objects.requireNonNull(entity.getBody())
+                .getTemplateList()
+                .get(0)
+                .getUrl()));
     }
 
 }

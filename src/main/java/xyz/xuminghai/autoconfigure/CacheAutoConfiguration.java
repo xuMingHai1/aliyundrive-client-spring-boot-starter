@@ -69,7 +69,7 @@ public class CacheAutoConfiguration {
         if (decoratorList.contains(CacheDecoratorEnum.NONE)) {
             return cache;
         }
-        // 给缓存实例添加装饰器
+        // 给缓存实例添加装饰器，装饰器顺序是有要求的
 
         // 日志装饰器
         if (decoratorList.contains(CacheDecoratorEnum.LOGGING)) {

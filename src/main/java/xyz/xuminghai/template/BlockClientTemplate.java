@@ -32,8 +32,7 @@ import java.nio.file.Path;
 
 /**
  * 2021/10/26 15:04 星期二<br/>
- * 阻塞式客户端，适用于直接获取响应结果，对结果进行操作
- *
+ * 阻塞式客户端，适用于直接获取响应结果，对结果进行操作<br/>
  * @author xuMingHai
  */
 public class BlockClientTemplate extends AbstractTemplate {
@@ -436,5 +435,15 @@ public class BlockClientTemplate extends AbstractTemplate {
     @Override
     public VideoPreviewPlayInfoResponse getVideoPreviewPlayInfo(String fileId) {
         return (VideoPreviewPlayInfoResponse) super.getVideoPreviewPlayInfo(fileId);
+    }
+
+    /**
+     * 获取播放音频信息
+     * @param fileId 文件ID
+     * @return 音频播放信息
+     */
+    @Override
+    public AudioPlayInfoResponse getAudioPlayInfo(String fileId) {
+        return blockExecutor.getAudioPlayInfo(fileId);
     }
 }

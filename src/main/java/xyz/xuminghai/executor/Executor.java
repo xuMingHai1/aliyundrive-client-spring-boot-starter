@@ -98,5 +98,11 @@ public interface Executor {
      */
     Object getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest);
 
+    /**
+     * 获取播放音频信息
+     * @param fileId 文件ID
+     * @return 响应后的操作
+     */
+    Object getAudioPlayInfo(String fileId);
 
 }

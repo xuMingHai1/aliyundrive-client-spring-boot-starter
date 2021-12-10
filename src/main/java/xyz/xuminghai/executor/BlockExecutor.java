@@ -226,4 +226,12 @@ public interface BlockExecutor extends Executor {
      */
     @Override
     VideoPreviewPlayInfoResponse getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest);
+
+    /**
+     * 获取播放音频信息
+     * @param fileId 文件ID
+     * @return 响应后的操作
+     */
+    @Override
+    AudioPlayInfoResponse getAudioPlayInfo(String fileId);
 }

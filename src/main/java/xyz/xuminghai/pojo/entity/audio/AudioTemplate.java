@@ -17,24 +17,19 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
-import java.util.List;
+import java.net.URL;
 
 /**
- * 2021/10/6 18:31 星期三<br/>
- * 音频使用的
+ * 2021/10/6 18:29 星期三<br/>
+ * 音频模板列表
  *
  * @author xuMingHai
  */
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class VideoPreviewMetadata {
-    private String bitrate;
-    private String duration;
-    private String audioFormat;
-    private String audioSampleRate;
-    private int audioChannels;
-    private List<AudioTemplate> audioTemplateList;
-    private AudioMeta audioMeta;
-    private AudioMusicMeta audioMusicMeta;
+public class AudioTemplate {
+    private String templateId;
+    private String status;
+    private URL url;
 }

@@ -64,15 +64,6 @@ public interface ReactiveFileDao extends ReactiveDao{
     WebClient.ResponseSpec getDownloadUrl(String fileId);
 
     /**
-     * 下载文件，支持分段下载，断点续传
-     *
-     * @param fileId      文件ID
-     * @param httpHeaders 表示 HTTP 请求头
-     * @return 响应实体
-     */
-    Mono<ResponseEntity<Resource>> downloadFile(String fileId, HttpHeaders httpHeaders);
-
-    /**
      * 获取多个文件的下载url
      *
      * @param multiDownloadUrlRequest 多文件下载请求
@@ -123,6 +114,13 @@ public interface ReactiveFileDao extends ReactiveDao{
      * @return 响应后的操作
      */
     WebClient.ResponseSpec getVideoPreviewPlayInfo(VideoPreviewPlayInfoRequest videoPreviewPlayInfoRequest);
+
+    /**
+     * 获取播放音频信息
+     * @param fileId 文件ID
+     * @return 响应后的操作
+     */
+    WebClient.ResponseSpec getAudioPlayInfo(String fileId);
 
 }
 

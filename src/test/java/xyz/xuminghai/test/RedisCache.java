@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import xyz.xuminghai.cache.AbstractCacheInstance;
 import xyz.xuminghai.serializer.Serializer;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -71,6 +72,12 @@ public class RedisCache extends AbstractCacheInstance {
     @Override
     public void put(Object key, Object value) {
         redisTemplate.opsForValue().set(key, value);
+    }
+
+    @Override
+    public void put(Object key, Object value, long timestampSeconds) {
+        redisTemplate.opsForValue().set(key, value);
+        redisTemplate.expireAt(key, Instant.ofEpochSecond(timestampSeconds));
     }
 
     /**

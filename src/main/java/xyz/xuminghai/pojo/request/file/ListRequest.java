@@ -51,24 +51,24 @@ public class ListRequest {
     private boolean all = false;
 
     /**
-     * 文件下载的url过期时间
+     * url过期时间
      */
     private int urlExpireSec = 1600;
 
     /**
-     * 图像缩略图过程
+     * 图片缩略图处理，具体细节可以看看阿里云OSS的图片处理参数
      */
-    private String imageThumbnailProcess = "image/resize,w400/format,jpeg";
+    private String imageThumbnailProcess = "image/resize,w_400/format,jpeg";
 
     /**
-     * 图片网址处理
+     * 图片url处理
      */
-    private String imageUrlProcess = "image/resize,w1920/format,jpeg";
+    private String imageUrlProcess = "image/resize,w_1920/format,jpeg";
 
     /**
      * 视频缩略图过程
      */
-    private String videoThumbnailProcess = "video/snapshot,t0,fJpg,arAuto,w300";
+    private String videoThumbnailProcess = "video/snapshot,t_0,f_jpg,ar_auto,w_300";
 
     /**
      * 领域

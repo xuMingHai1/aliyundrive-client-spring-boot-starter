@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 /**
  * 2021/10/18 20:30 星期一<br/>
@@ -70,7 +69,7 @@ public final class HashUtils {
      */
     @SuppressWarnings("AlibabaUndefineMagicConstant")
     public static String sha1(Path path) {
-        checkFile(Objects.requireNonNull(path, "path 为 null"));
+        checkFile(path);
         log.info("开始计算【{}】的sha1", path.getFileName());
         if (SYSTEM_NAME.contains(LIST.get(0))) {
             return windowsSha1(path.toAbsolutePath().toString()).toUpperCase(Locale.ROOT);

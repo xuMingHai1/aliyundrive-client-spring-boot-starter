@@ -12,9 +12,6 @@
 
 package xyz.xuminghai.template;
 
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 import xyz.xuminghai.cache.Cache;
@@ -25,8 +22,12 @@ import xyz.xuminghai.exception.InvalidBaseItemException;
 import xyz.xuminghai.executor.ReactiveBaseExecutor;
 import xyz.xuminghai.executor.ReactiveCacheExecutor;
 import xyz.xuminghai.executor.ReactiveExecutor;
+import xyz.xuminghai.io.AliyunInputResource;
 import xyz.xuminghai.pojo.entity.BaseItem;
+import xyz.xuminghai.pojo.entity.DocItem;
 import xyz.xuminghai.pojo.entity.ImageItem;
+import xyz.xuminghai.pojo.entity.VideoItem;
+import xyz.xuminghai.pojo.entity.audio.AudioTemplate;
 import xyz.xuminghai.pojo.entity.video.LiveTranscodingTask;
 import xyz.xuminghai.pojo.enums.CategoryEnum;
 import xyz.xuminghai.pojo.enums.CheckNameEnum;
@@ -227,11 +228,10 @@ public class ReactiveClientTemplate extends AbstractTemplate {
      * 下载文件，支持分段下载，断点续传
      *
      * @param fileId      文件ID
-     * @param httpHeaders 表示 HTTP 请求头
      * @return Http异步响应体
      */
-    public Mono<ResponseEntity<Resource>> downloadFile(String fileId, HttpHeaders httpHeaders) {
-        return reactiveExecutor.downloadFile(fileId, httpHeaders);
+    public Mono<ResponseEntity<AliyunInputResource>> downloadFile(String fileId) {
+        return reactiveExecutor.downloadFile(fileId);
     }
 
     /**
@@ -402,7 +402,7 @@ public class ReactiveClientTemplate extends AbstractTemplate {
     }
 
     /**
-     * 将原始的m3u8文件的ts文件相对地址改为绝对地址
+     * 获取视频资源(m3u8文件)
      * <pre>
      *  480p 576p 被称为度SD(Standard Definition)（标清）
      *
@@ -417,32 +417,131 @@ public class ReactiveClientTemplate extends AbstractTemplate {
      * @param url {@link LiveTranscodingTask#getUrl()}
      * @return 处理后的m3u8文件
      */
-    public Mono<ResponseEntity<Resource>> palyVideo(URL url) {
-       return reactiveExecutor.parseVideoUrl(url);
+    public Mono<ResponseEntity<AliyunInputResource>> getVideo(URL url) {
+        return reactiveExecutor.getVideo(url);
     }
 
     /**
-     * 获取图片资源
+     * 获取视频的缩略图，是在浏览器中显示而不是下载
      * @param fileId 文件ID
-     * @param thumbnail true使用缩略图的url，false使用原始图（ImageItem中的thumbnail缩略图）
-     * @return 图片资源
+     * @return 视频的缩略图
      */
-    public Mono<ResponseEntity<Resource>> getImage(String fileId, boolean thumbnail) {
-        return get(fileId).flatMap(baseItemResponseEntity -> {
-            URL url = null;
-            MediaType mediaType = null;
+    public Mono<ResponseEntity<AliyunInputResource>> getVideoThumbnail(String fileId) {
+        return get(fileId).flatMap(entiy -> {
             try {
-                final ImageItem imageItem = ImageItem.valueOf(baseItemResponseEntity.getBody());
-                if (thumbnail) {
-                    url = imageItem.getThumbnail();
-                } else {
-                    url = imageItem.getUrl();
-                }
-               mediaType = MediaType.parseMediaType(imageItem.getMimeType());
+                final VideoItem videoItem = VideoItem.valueOf(entiy.getBody());
+                return getResource(videoItem.getThumbnail());
             } catch (InvalidBaseItemException e) {
-                e.printStackTrace();
+                return Mono.error(e);
             }
-            return reactiveExecutor.getResource(url, mediaType);
         });
     }
+
+    /**
+     * 根据阿里云盘资源的url获取资源
+     * @param url 阿里云盘资源url
+     * @return 这个url对应的资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getResource(URL url) {
+        return reactiveExecutor.getResource(url);
+    }
+
+    /**
+     * 获取图片资源，是在浏览器中显示而不是下载
+     * @param fileId 文件ID
+     * @return 图片资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getImage(String fileId) {
+       return getImageResource(fileId, false);
+    }
+
+    /**
+     * 获取图片资源缩略图，是在浏览器中显示而不是下载
+     * @param fileId 文件ID
+     * @return 图片资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getImageThumbnail(String fileId) {
+        return getImageResource(fileId, true);
+    }
+
+    /**
+     * 获取图片资源，是在浏览器中显示而不是下载
+     * @param fileId 文件ID
+     * @param thumbnail 是否获取的是缩略图
+     * @return 图片资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getImageResource(String fileId, boolean thumbnail) {
+        return get(fileId).flatMap(entity -> {
+            try {
+                final ImageItem imageItem = ImageItem.valueOf(entity.getBody());
+                if (thumbnail) {
+                    return reactiveExecutor.getResource(imageItem.getThumbnail());
+                }
+                return reactiveExecutor.getResource(imageItem.getUrl());
+            } catch (InvalidBaseItemException e) {
+                return Mono.error(e);
+            }
+        });
+    }
+
+    /**
+     * 获取文档资源，是在浏览器中显示而不是下载
+     * @param fileId 文件ID
+     * @return 文档资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getDoc(String fileId) {
+        return getDocResource(fileId, false);
+    }
+
+    /**
+     * 获取文档资源缩略图，是在浏览器中显示而不是下载
+     * @param fileId 文件ID
+     * @return 文档资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getDocThumbnail(String fileId) {
+        return getDocResource(fileId, true);
+    }
+
+    /**
+     * 获取文档资源，是在浏览器中显示而不是下载
+     * @param fileId 文件ID
+     * @param thumbnail 是否获取的是缩略图
+     * @return 文档资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getDocResource(String fileId, boolean thumbnail) {
+        return get(fileId).flatMap(entity -> {
+            try {
+                final DocItem docItem = DocItem.valueOf(entity.getBody());
+                if (thumbnail) {
+                    return reactiveExecutor.getResource(docItem.getThumbnail());
+                }
+                return reactiveExecutor.getResource(docItem.getUrl());
+            } catch (InvalidBaseItemException e) {
+                return Mono.error(e);
+            }
+        });
+    }
+
+
+    /**
+     * 获取播放音频信息
+     * @param fileId 文件ID
+     * @return 音频播放信息
+     */
+    @Override
+    public Mono<ResponseEntity<AudioPlayInfoResponse>> getAudioPlayInfo(String fileId) {
+        return reactiveExecutor.getAudioPlayInfo(fileId);
+    }
+
+    /**
+     * 获取音频资源
+     * @param url 音频资源的url，参见{@link #getAudioPlayInfo(String)}的{@link AudioTemplate#getUrl()}
+     * @return 音频资源
+     */
+    public Mono<ResponseEntity<AliyunInputResource>> getAudio(URL url) {
+        return getResource(url);
+    }
+
+
+
 }

@@ -34,6 +34,11 @@ public class NullCache implements Cache {
     }
 
     @Override
+    public void put(Object key, Object value, long timestampSeconds) {
+
+    }
+
+    @Override
     public Object get(Object key) {
         return null;
     }

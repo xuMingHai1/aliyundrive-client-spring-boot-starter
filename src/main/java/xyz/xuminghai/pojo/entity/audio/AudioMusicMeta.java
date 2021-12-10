@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
+import java.net.URL;
+
 /**
  * 2021/10/6 18:31 星期三<br/>
  * 音频音乐元
@@ -27,8 +29,23 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AudioMusicMeta {
+    /**
+     * 标题
+     */
     private String title;
+
+    /**
+     * 艺术家
+     */
     private String artist;
+
+    /**
+     * 专辑
+     */
     private String album;
-    private String coverUrl;
+
+    /**
+     * 封面地址
+     */
+    private URL coverUrl;
 }

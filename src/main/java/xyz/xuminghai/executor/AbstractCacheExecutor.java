@@ -31,8 +31,15 @@ abstract class AbstractCacheExecutor implements Executor{
      */
     final Cache cache;
 
+    /**
+     * 获取缓存超时时间
+     */
+    static final long GET_CACHE_TIMEOUT = 1000L;
+
     AbstractCacheExecutor(Cache cache) {
         this.cache = cache;
     }
+
+
 
 }
